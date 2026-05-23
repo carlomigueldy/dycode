@@ -8,3 +8,4 @@ pnpm-lock.yaml
 .turbo
 .superpowers
 docs/superpowers/specs/**/*.md
+docs/superpowers/plans/**/*.md

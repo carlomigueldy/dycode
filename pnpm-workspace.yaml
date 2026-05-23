@@ -1,3 +1,3 @@
 packages:
-  - "packages/*"
+  - 'packages/*'
   # future: "apps/*", "daemons/*", "adapters/*"
