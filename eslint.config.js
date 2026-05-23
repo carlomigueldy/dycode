@@ -52,5 +52,14 @@ export default tseslint.config(
   {
     files: ['**/*.{js,mjs,cjs}'],
     ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: { ...globals.node },
+      parserOptions: {
+        project: false,
+        projectService: false,
+      },
+    },
   },
 )
