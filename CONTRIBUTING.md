@@ -1,0 +1,60 @@
+# Contributing to dycode
+
+Thanks for your interest. dycode is built using **harness engineering** — see the design
+spec at `docs/superpowers/specs/2026-05-23-dycode-design.md` §4 for the discipline overview.
+
+## TL;DR
+
+1. Read `CLAUDE.md` (or `AGENTS.md`).
+2. Branch: `feat/<short-id>-<slug>` or `fix/<short-id>-<slug>`.
+3. Make your change. Include relevant `CLAUDE.md`/`AGENTS.md` updates and `feature_list.json`
+   scope changes in the same commit / PR.
+4. Run `./scripts/verify.sh` — must exit 0.
+5. Open a PR. CI runs the same `verify.sh`.
+6. A reviewer (≠ you) gives a verdict on **consistency · scalability · maintainability ·
+   correctness**. Anything below 10/10 blocks merge until addressed.
+
+## The 5 quality gates
+
+```
+typecheck → lint → format → test → reviewer 10/10
+```
+
+1. `pnpm typecheck` — exit 0
+2. `pnpm lint` — exit 0, zero warnings
+3. `pnpm format` — exit 0 (Prettier check)
+4. `pnpm test` — exit 0
+5. Reviewer verdict ≥ 10/10
+
+Gates 1–4 are automated by `scripts/verify.sh` and CI. Gate 5 is the review protocol.
+
+## Reviewer protocol
+
+- Reviewer ≠ author.
+- Score 0–10 on each dimension: consistency, scalability, maintainability, correctness.
+- Composite verdict must be **10/10** to approve.
+- Concrete, named feedback. "Add error handling" is not feedback; "L42 swallows the
+  parse failure — surface it as a `Result.Err` with the input range" is.
+- Stale reviews invalidated on `git push --force-with-lease` to the PR branch.
+
+## Commit style
+
+Conventional commits:
+
+- `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `build:`, `ci:`
+- Scope optional: `feat(adapters): …`, `fix(daemon): …`
+- One feature per branch. Don't bundle unrelated changes.
+
+## Adapters
+
+Adapter authoring guide lives at `docs/tutorials/adapter-quickstart.md` (added in Plan 02+).
+Built-in adapters live in `adapters/<id>/` (`@dycode/adapter-<id>`). Community adapters
+publish as `dycode-adapter-<id>`.
+
+## Code of conduct
+
+See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). We follow the Contributor Covenant v2.1.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for reporting.
