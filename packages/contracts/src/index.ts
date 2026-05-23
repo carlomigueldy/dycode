@@ -47,3 +47,11 @@ export type {
   TaskScope,
   TaskState,
 } from './domain/task.js'
+
+// Domain — event log
+export {
+  ADAPTER_EVENT_KINDS,
+  AdapterEventKindSchema,
+  EventLogEntrySchema,
+} from './domain/event-log.js'
+export type { AdapterEventKind, EventLogEntry } from './domain/event-log.js'
