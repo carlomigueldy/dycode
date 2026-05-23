@@ -12,6 +12,12 @@ node_modules/
 dist/
 build/
 out/
+
+# Build / cache artifacts
+.turbo/
+*.tsbuildinfo
+coverage/
+
 *.log
 .env
 .env.local
