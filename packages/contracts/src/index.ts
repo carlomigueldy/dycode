@@ -25,3 +25,7 @@ export type { Workspace, WorkspaceSettings } from './domain/workspace.js'
 // Domain — agent
 export { AGENT_STATUSES, AgentSchema, AgentStatusSchema } from './domain/agent.js'
 export type { Agent, AgentStatus } from './domain/agent.js'
+
+// Domain — squad
+export { SquadSchema } from './domain/squad.js'
+export type { Squad } from './domain/squad.js'
