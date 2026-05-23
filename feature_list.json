@@ -22,5 +22,37 @@
     "state": "passing",
     "evidence": "Run #26328241858 · 24s · all 4 gates green · https://github.com/carlomigueldy/dycode/actions/runs/26328241858",
     "blocked_by": null
+  },
+  {
+    "id": "F04",
+    "behavior": "@dycode/contracts publishes branded IDs, AgentStatus, Capability, Workspace, Agent, Squad, Task, ReviewVerdict, TaskEvidence, EventLogEntry as Zod-first schemas with TS types inferred via z.infer.",
+    "verification": "pnpm --filter @dycode/contracts test",
+    "state": "passing",
+    "evidence": "Plan 02 · Tasks 02-08, 15",
+    "blocked_by": null
+  },
+  {
+    "id": "F05",
+    "behavior": "@dycode/contracts publishes JSON-RPC envelopes, error codes, MethodName enum, and per-method params/result schemas for all 29 methods + 5 notification variants.",
+    "verification": "pnpm --filter @dycode/contracts test",
+    "state": "passing",
+    "evidence": "Plan 02 · Tasks 09-14",
+    "blocked_by": null
+  },
+  {
+    "id": "F06",
+    "behavior": "@dycode/adapter-sdk publishes AdapterPlugin / AdapterInstance interfaces, AdapterManifest + AdapterEvent schemas, TaskCtx/CreateOpts/Prompt/HealthReport/DetectionResult types, and a createAdapter() helper.",
+    "verification": "pnpm --filter @dycode/adapter-sdk test && pnpm --filter @dycode/adapter-sdk typecheck",
+    "state": "passing",
+    "evidence": "Plan 02 · Tasks 01, 16-20",
+    "blocked_by": null
+  },
+  {
+    "id": "F07",
+    "behavior": "Full workspace verify.sh exits 0 with all four gates green on the Plan 02 deliverable (two packages, both type-checked, lint-clean, format-clean, all tests passing).",
+    "verification": "bash scripts/verify.sh",
+    "state": "passing",
+    "evidence": "Plan 02 close-out",
+    "blocked_by": null
   }
 ]

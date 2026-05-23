@@ -23,8 +23,8 @@ pnpm test:watch       # iterative dev loop
 - **Design spec** → `docs/superpowers/specs/2026-05-23-dycode-design.md`
 - **Plans** → `docs/superpowers/plans/`
 - **Architecture (deeper)** → `docs/architecture/` (added in later plans)
-- **Adapter SDK** → `docs/adapters/` (Plan 02+)
-- **IPC protocol** → `docs/ipc-protocol/` (Plan 02+)
+- **Adapter SDK** → `docs/adapters/sdk.md` · package: `packages/adapter-sdk/CLAUDE.md`
+- **IPC protocol** → `docs/ipc-protocol/spec.md` · package: `packages/contracts/CLAUDE.md`
 - **Contracts package** → `packages/contracts/CLAUDE.md`
 
 ## Hard constraints

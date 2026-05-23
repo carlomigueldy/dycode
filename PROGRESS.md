@@ -45,3 +45,40 @@ Blockers:
 - F03 flipped to `passing`: repo pushed to https://github.com/carlomigueldy/dycode,
   first CI run #26328241858 green in 24s (all 4 automated gates).
 - Next plan: Plan 02 — `@dycode/contracts` real Zod schemas + `@dycode/adapter-sdk` package.
+
+---
+
+## 2026-05-23 · Plan 02 · Contracts + Adapter SDK
+
+Done:
+
+- Branded ULID-typed IDs (Workspace/Agent/Squad/Task).
+- Domain schemas: Workspace, Agent + AgentStatus, Capability, Squad (leader-in-members invariant),
+  Task (state machine + ReviewVerdict + TaskEvidence discriminated union + assignee≠reviewer refinement),
+  EventLogEntry.
+- IPC schemas: JSON-RPC 2.0 envelopes, dycode error codes, MethodName enum (29 methods),
+  workspace._/runtime._/adapter._/squad._/pool._/task._/events.\* params+result schemas,
+  Notification union (5 variants).
+- @dycode/contracts barrel published; CONTRACTS_VERSION → 0.1.0.
+- @dycode/adapter-sdk package scaffolded with the 3-tsconfig pattern.
+- AdapterManifest + AdapterEvent schemas; AdapterPlugin/AdapterInstance interfaces;
+  TaskCtx/CreateOpts/Prompt/HealthReport/DetectionResult types; createAdapter() helper.
+- SDK_VERSION → 0.1.0. Public barrel; Capability re-exported from contracts.
+- Per-package CLAUDE.md/AGENTS.md for adapter-sdk.
+- Deep docs: `docs/adapters/sdk.md`, `docs/ipc-protocol/spec.md`.
+- Updated root CLAUDE.md "Where to look" links (no more "(Plan 02+)" placeholders).
+- feature_list.json updated with F04-F07 (all passing).
+
+Remaining (deferred to later plans):
+
+- `dycoded` daemon skeleton + first real adapter (Plan 03).
+- Verifier adapters + orchestrator core (Plan 04).
+- Electron shell + Fleet view (Plan 05).
+- Round-out adapters + task/activity UIs (Plan 06).
+- Packaging + docs site + beta (Plan 07).
+
+Blockers:
+
+- None.
+
+Tagged: `v0.0.2-plan-02`.
