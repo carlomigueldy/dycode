@@ -3,7 +3,6 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "dist/.tsc-tests",
-    "composite": true,
     "tsBuildInfoFile": "dist/.tsc-tests/.tsbuildinfo"
   },
   "include": ["src/**/*", "tests/**/*"]
