@@ -19,3 +19,7 @@ export type { DetectionResult, HealthReport } from './health.js'
 
 // Helper
 export { createAdapter } from './create-adapter.js'
+
+// Re-export Capability from contracts so adapter authors don't need two imports
+export { CAPABILITIES, CapabilitySchema } from '@dycode/contracts'
+export type { Capability } from '@dycode/contracts'
