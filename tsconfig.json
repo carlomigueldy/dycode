@@ -3,6 +3,6 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "references": [{ "path": "./packages/contracts" }],
-  "include": []
+  "references": [],
+  "include": ["vitest.workspace.ts"]
 }

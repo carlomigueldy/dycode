@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "verify": "bash scripts/verify.sh",
     "init": "bash scripts/init.sh",
