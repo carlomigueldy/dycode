@@ -3,6 +3,9 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "references": [{ "path": "./packages/contracts" }],
+  "references": [
+    { "path": "./packages/contracts" },
+    { "path": "./packages/adapter-sdk" }
+  ],
   "include": ["vitest.workspace.ts", "packages/*/vitest.config.ts"]
 }
