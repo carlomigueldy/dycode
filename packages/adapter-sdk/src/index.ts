@@ -16,3 +16,6 @@ export type { CreateOpts, Prompt, TaskCtx } from './context.js'
 
 // Health
 export type { DetectionResult, HealthReport } from './health.js'
+
+// Helper
+export { createAdapter } from './create-adapter.js'
