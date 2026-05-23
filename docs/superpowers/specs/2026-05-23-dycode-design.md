@@ -903,6 +903,8 @@ same commands work for the human and the agent.*
 | 4    | `pnpm test:e2e`                  | End-to-end suite pass (Playwright) for any task with E2E scope              |
 | 5    | Reviewer verdict                 | A reviewer (human or `review.judge`-capable agent) gives **10/10**          |
 
+**Plan 01 implementation note:** Until the E2E suite lands (Plan 05+), gate 4 (`pnpm test:e2e`) is collapsed into gate 3 (`pnpm test`), and Prettier `pnpm format` is surfaced as a separate gate for failure clarity. The 5-gate count is preserved; the order is `typecheck → lint → format → test → reviewer 10/10`.
+
 ### 9.4 Reviewer protocol
 
 - The reviewer is **a different agent (or human) than the assignee**. The orchestrator enforces
@@ -951,7 +953,7 @@ Touching scope = touching this file in the same PR.
 
 ### 9.8 Contribution mechanics
 
-- Branches: `feature/<short-id>-<slug>`, `fix/<short-id>-<slug>`, `chore/<slug>`.
+- Branches: `feat/<short-id>-<slug>`, `fix/<short-id>-<slug>`, `chore/<slug>`.
 - Commits: conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
 - One feature per branch. Don't bundle unrelated changes.
 - New adapters live in `adapters/<adapter-id>/` (built-in) or a separate repo (community).

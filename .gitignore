@@ -15,6 +15,7 @@ out/
 
 # Build / cache artifacts
 .turbo/
+.tsc-tests/
 *.tsbuildinfo
 coverage/
 

@@ -11,6 +11,7 @@ export default tseslint.config(
       '**/build/**',
       '**/coverage/**',
       '**/.turbo/**',
+      '**/.tsc-tests/**',
       '**/node_modules/**',
       '**/.superpowers/**',
       'pnpm-lock.yaml',
