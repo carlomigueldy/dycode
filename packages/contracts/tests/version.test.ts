@@ -15,4 +15,9 @@ describe('CONTRACTS_VERSION', () => {
     const major = Number.parseInt(CONTRACTS_VERSION.split('.')[0] ?? '', 10)
     expect(major).toBe(0)
   })
+
+  it('reached minor version 1 once schemas started landing (Plan 02)', () => {
+    const minor = Number.parseInt(CONTRACTS_VERSION.split('.')[1] ?? '', 10)
+    expect(minor).toBeGreaterThanOrEqual(1)
+  })
 })
