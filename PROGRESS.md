@@ -28,3 +28,14 @@ Remaining (deferred to later plans):
 Blockers:
 
 - None.
+
+---
+
+## 2026-05-23 · Plan 01 closed
+
+- All 20 tasks complete. `./scripts/verify.sh` exits 0 locally with all 4 gates green.
+- Tagged `v0.0.1-plan-01`.
+- F03 (CI verified green) deferred to a follow-up: no GitHub remote configured for this
+  workspace yet. When a remote is added and the first push succeeds, flip F03's state
+  from `not_started` to `passing` and record the run URL as evidence.
+- Next plan: Plan 02 — `@dycode/contracts` real Zod schemas + `@dycode/adapter-sdk` package.
