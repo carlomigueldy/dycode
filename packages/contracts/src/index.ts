@@ -78,3 +78,5 @@ export type { MethodName } from './ipc/methods.js'
 export * from './ipc/methods.workspace.js'
 // IPC — method schemas (runtime + adapter)
 export * from './ipc/methods.runtime.js'
+// IPC — method schemas (fleet)
+export * from './ipc/methods.fleet.js'
