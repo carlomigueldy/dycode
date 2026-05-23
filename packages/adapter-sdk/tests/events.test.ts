@@ -1,3 +1,4 @@
+import { ADAPTER_EVENT_KINDS } from '@dycode/contracts'
 import { describe, expect, it } from 'vitest'
 import { AdapterEventSchema } from '../src/events.js'
 
@@ -57,5 +58,39 @@ describe('AdapterEventSchema', () => {
     expect(
       AdapterEventSchema.safeParse({ type: 'done', status: 'maybe', summary: '?' }).success,
     ).toBe(false)
+  })
+})
+
+describe('AdapterEvent ↔ contracts.ADAPTER_EVENT_KINDS alignment', () => {
+  it('every contracts kind has an AdapterEvent variant', () => {
+    for (const kind of ADAPTER_EVENT_KINDS) {
+      // Build a minimal-valid event for each kind to assert the discriminator covers it.
+      const probe = (() => {
+        switch (kind) {
+          case 'output':
+            return { type: 'output', chunk: '' }
+          case 'tool_call':
+            return { type: 'tool_call', name: 'x', input: {} }
+          case 'tool_result':
+            return { type: 'tool_result', name: 'x', out: {} }
+          case 'progress':
+            return { type: 'progress' }
+          case 'verify_request':
+            return { type: 'verify_request', cmd: 'x' }
+          case 'done':
+            return { type: 'done', status: 'ok', summary: '' }
+          case 'error':
+            return { type: 'error', message: 'x' }
+        }
+      })()
+      expect(AdapterEventSchema.safeParse(probe).success).toBe(true)
+    }
+  })
+
+  it('AdapterEvent has no kinds beyond ADAPTER_EVENT_KINDS', () => {
+    const knownKinds = new Set<string>(ADAPTER_EVENT_KINDS)
+    const sdkVariants = AdapterEventSchema.options.map((o) => o.shape.type.value)
+    for (const v of sdkVariants) expect(knownKinds.has(v)).toBe(true)
+    expect(sdkVariants.length).toBe(ADAPTER_EVENT_KINDS.length)
   })
 })

@@ -19,8 +19,14 @@ describe('SquadSchema', () => {
     expect(SquadSchema.safeParse({ ...validSquad, leaderAgentId: null }).success).toBe(true)
   })
 
-  it('accepts an empty memberAgentIds array (newly-created squad)', () => {
-    expect(SquadSchema.safeParse({ ...validSquad, memberAgentIds: [] }).success).toBe(true)
+  it('accepts an empty memberAgentIds array when leaderAgentId is also null (newly-created squad)', () => {
+    expect(
+      SquadSchema.safeParse({ ...validSquad, leaderAgentId: null, memberAgentIds: [] }).success,
+    ).toBe(true)
+  })
+
+  it('rejects leaderAgentId set when memberAgentIds is empty', () => {
+    expect(SquadSchema.safeParse({ ...validSquad, memberAgentIds: [] }).success).toBe(false)
   })
 
   it('rejects when leaderAgentId is set but not in memberAgentIds', () => {

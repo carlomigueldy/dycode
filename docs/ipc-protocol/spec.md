@@ -19,7 +19,7 @@
 
 Every request carries `protocolVersion: 1`. Mismatches return error code `PROTOCOL_VERSION_MISMATCH (-32099)`.
 
-## Methods (29)
+## Methods (30)
 
 Canonical list: `MethodName` from `packages/contracts/src/ipc/methods.ts`.
 

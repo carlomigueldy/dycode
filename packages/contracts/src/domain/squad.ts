@@ -13,15 +13,9 @@ export const SquadSchema = z
     createdAt: z.number().int().nonnegative(),
   })
   .strict()
-  .refine(
-    (s) =>
-      s.leaderAgentId === null ||
-      s.memberAgentIds.length === 0 ||
-      s.memberAgentIds.includes(s.leaderAgentId),
-    {
-      message: 'leaderAgentId must appear in memberAgentIds',
-      path: ['leaderAgentId'],
-    },
-  )
+  .refine((s) => s.leaderAgentId === null || s.memberAgentIds.includes(s.leaderAgentId), {
+    message: 'leaderAgentId must appear in memberAgentIds',
+    path: ['leaderAgentId'],
+  })
 
 export type Squad = z.infer<typeof SquadSchema>

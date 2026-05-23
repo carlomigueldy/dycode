@@ -33,7 +33,7 @@
   },
   {
     "id": "F05",
-    "behavior": "@dycode/contracts publishes JSON-RPC envelopes, error codes, MethodName enum, and per-method params/result schemas for all 29 methods + 5 notification variants.",
+    "behavior": "@dycode/contracts publishes JSON-RPC envelopes, error codes, MethodName enum, and per-method params/result schemas for all 30 methods + 5 notification variants.",
     "verification": "pnpm --filter @dycode/contracts test",
     "state": "passing",
     "evidence": "Plan 02 · Tasks 09-14",

@@ -56,7 +56,7 @@ Done:
 - Domain schemas: Workspace, Agent + AgentStatus, Capability, Squad (leader-in-members invariant),
   Task (state machine + ReviewVerdict + TaskEvidence discriminated union + assignee≠reviewer refinement),
   EventLogEntry.
-- IPC schemas: JSON-RPC 2.0 envelopes, dycode error codes, MethodName enum (29 methods),
+- IPC schemas: JSON-RPC 2.0 envelopes, dycode error codes, MethodName enum (30 methods),
   workspace._/runtime._/adapter._/squad._/pool._/task._/events.\* params+result schemas,
   Notification union (5 variants).
 - @dycode/contracts barrel published; CONTRACTS_VERSION → 0.1.0.

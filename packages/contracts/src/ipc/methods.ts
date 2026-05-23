@@ -7,7 +7,7 @@ import { z } from 'zod'
  * To add a method:
  *  1. Add the literal to METHOD_NAMES (preserving area grouping).
  *  2. Add a method-specific schema in ipc/methods.<area>.ts.
- *  3. Register its params/result in MethodParamsSchemas / MethodResultSchemas (Task 11+).
+ *  3. Add a method-specific test in tests/ipc/methods.<area>.test.ts.
  *  4. Bump CONTRACTS_VERSION minor.
  */
 export const METHOD_NAMES = [
