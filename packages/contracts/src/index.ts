@@ -29,3 +29,21 @@ export type { Agent, AgentStatus } from './domain/agent.js'
 // Domain — squad
 export { SquadSchema } from './domain/squad.js'
 export type { Squad } from './domain/squad.js'
+
+// Domain — task
+export {
+  REVIEW_DIMENSIONS,
+  ReviewVerdictSchema,
+  TASK_STATES,
+  TaskEvidenceSchema,
+  TaskSchema,
+  TaskStateSchema,
+} from './domain/task.js'
+export type {
+  ReviewDimension,
+  ReviewVerdict,
+  Task,
+  TaskEvidence,
+  TaskScope,
+  TaskState,
+} from './domain/task.js'
