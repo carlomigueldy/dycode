@@ -41,6 +41,9 @@ pnpm test:watch       # iterative dev loop
 7. **No emojis in code or docs** unless explicitly asked for a UI surface.
 8. **No half-broken features.** If you can't define a verification command, it
    isn't a feature yet — it's a question.
+9. **No LLM attribution in commits.** Commits must list a human as author and
+   contain no `Co-Authored-By:` lines naming an LLM (Claude, GPT, Codex, etc.).
+   The work is yours; tools assist. Same rule for PR descriptions and tags.
 
 ## Layout (current)
 

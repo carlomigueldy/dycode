@@ -40,6 +40,8 @@ pnpm test:watch
 6. Conventional commits.
 7. No emojis in source / docs unless requested for UI.
 8. No half-broken features. Verification command required per feature.
+9. No LLM attribution in commits, PRs, or tags. Author is the human; no
+   `Co-Authored-By: <LLM>` lines.
 
 ## Progressive disclosure
 
