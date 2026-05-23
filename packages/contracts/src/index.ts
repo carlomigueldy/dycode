@@ -80,3 +80,5 @@ export * from './ipc/methods.workspace.js'
 export * from './ipc/methods.runtime.js'
 // IPC — method schemas (fleet)
 export * from './ipc/methods.fleet.js'
+// IPC — method schemas (task)
+export * from './ipc/methods.task.js'
