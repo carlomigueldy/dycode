@@ -1,0 +1,17 @@
+# Brainstorming session artifacts
+.superpowers/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node
+node_modules/
+dist/
+build/
+out/
+*.log
+.env
+.env.local
