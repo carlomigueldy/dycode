@@ -21,3 +21,7 @@ export type { Capability } from './domain/capability.js'
 // Domain — workspace
 export { WorkspaceSchema } from './domain/workspace.js'
 export type { Workspace, WorkspaceSettings } from './domain/workspace.js'
+
+// Domain — agent
+export { AGENT_STATUSES, AgentSchema, AgentStatusSchema } from './domain/agent.js'
+export type { Agent, AgentStatus } from './domain/agent.js'
