@@ -69,3 +69,7 @@ export type {
   JsonRpcRequestEnvelope,
   JsonRpcResponseEnvelope,
 } from './ipc/envelope.js'
+
+// IPC — method names
+export { METHOD_NAMES, MethodNameSchema } from './ipc/methods.js'
+export type { MethodName } from './ipc/methods.js'
