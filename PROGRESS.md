@@ -34,7 +34,14 @@ Blockers:
 ## 2026-05-23 · Plan 01 closed
 
 - All 20 tasks complete. `./scripts/verify.sh` exits 0 locally with all 4 gates green.
-- Tagged `v0.0.1-plan-01`.
+- Final code review verdict (subagent-driven): **10/10** after consolidated fix commit
+  `5413dc2` addressing the three Important findings from the initial 9.25/10 review:
+  - **I1**: moved test build artifacts out of `dist/.tsc-tests/` so `npm pack` doesn't
+    leak them when the contracts package eventually publishes.
+  - **I2**: normalized branch prefix to `feat/` across spec and contributing docs.
+  - **I3**: added a §9.3 implementation note explaining the gate-numbering choice
+    (`format` surfaced separately; e2e collapsed into `test` until Plan 05+).
+- Tagged `v0.0.1-plan-01` at `5413dc2` (includes all fixes).
 - F03 (CI verified green) deferred to a follow-up: no GitHub remote configured for this
   workspace yet. When a remote is added and the first push succeeds, flip F03's state
   from `not_started` to `passing` and record the run URL as evidence.
