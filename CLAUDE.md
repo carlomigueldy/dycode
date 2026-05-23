@@ -21,6 +21,7 @@ pnpm test:watch       # iterative dev loop
 ## Where to look
 
 - **Design spec** → `docs/superpowers/specs/2026-05-23-dycode-design.md`
+- **Plan roadmap (status of every plan)** → `docs/superpowers/plans/README.md`
 - **Plans** → `docs/superpowers/plans/`
 - **Architecture (deeper)** → `docs/architecture/` (added in later plans)
 - **Adapter SDK** → `docs/adapters/sdk.md` · package: `packages/adapter-sdk/CLAUDE.md`

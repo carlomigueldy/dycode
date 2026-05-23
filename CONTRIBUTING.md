@@ -45,6 +45,27 @@ Conventional commits:
 - Scope optional: `feat(adapters): …`, `fix(daemon): …`
 - One feature per branch. Don't bundle unrelated changes.
 
+## Plans and linked GitHub issues
+
+Each plan in `docs/superpowers/plans/` has exactly one tracking issue on GitHub.
+The plan file is the spec; the issue is the worklog and status.
+
+- **Branch from a plan issue.** If you're picking up Plan NN, your branch is
+  `feat/plan-NN-<slug>` (same `<slug>` as the plan filename, lowercase, kebab-case).
+- **Link the PR to the issue.** Include `Closes #N` (where `N` is the plan
+  issue's number) in the PR description. When the PR merges to `main`, GitHub
+  auto-closes the linked issue. Do not close plan issues by hand.
+- **One plan, one PR (preferred).** Plans are sized so the whole plan lands in
+  a single PR with the tag at the end. If you must split, the final PR carries
+  the `Closes #N` line and the rest reference the issue without closing it.
+- **Update the index in the same PR.** Move the plan entry in
+  `docs/superpowers/plans/README.md` from "Not started" to "Shipped" along with
+  the tag. CI checks that the index is current.
+
+The plan index — `docs/superpowers/plans/README.md` — is the source of truth
+for what's shipped, what's in flight, and what's queued. Read it before
+starting any plan work.
+
 ## Adapters
 
 Adapter authoring guide lives at `docs/tutorials/adapter-quickstart.md` (added in Plan 02+).
