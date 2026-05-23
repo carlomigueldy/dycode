@@ -55,3 +55,17 @@ export {
   EventLogEntrySchema,
 } from './domain/event-log.js'
 export type { AdapterEventKind, EventLogEntry } from './domain/event-log.js'
+
+// IPC — envelope
+export {
+  ERROR_CODE,
+  JsonRpcErrorSchema,
+  JsonRpcRequestEnvelopeSchema,
+  JsonRpcResponseEnvelopeSchema,
+} from './ipc/envelope.js'
+export type {
+  ErrorCode,
+  JsonRpcError,
+  JsonRpcRequestEnvelope,
+  JsonRpcResponseEnvelope,
+} from './ipc/envelope.js'
