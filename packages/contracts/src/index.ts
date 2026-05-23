@@ -17,3 +17,7 @@ export type { AgentId, SquadId, TaskId, WorkspaceId } from './ids.js'
 // Domain — capability
 export { CAPABILITIES, CapabilitySchema } from './domain/capability.js'
 export type { Capability } from './domain/capability.js'
+
+// Domain — workspace
+export { WorkspaceSchema } from './domain/workspace.js'
+export type { Workspace, WorkspaceSettings } from './domain/workspace.js'
