@@ -82,3 +82,10 @@ export * from './ipc/methods.runtime.js'
 export * from './ipc/methods.fleet.js'
 // IPC — method schemas (task)
 export * from './ipc/methods.task.js'
+
+// IPC — method schemas (events)
+export * from './ipc/methods.events.js'
+
+// IPC — notifications
+export { NotificationSchema } from './ipc/notifications.js'
+export type { Notification } from './ipc/notifications.js'
