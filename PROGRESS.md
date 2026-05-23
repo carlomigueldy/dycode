@@ -42,7 +42,6 @@ Blockers:
   - **I3**: added a §9.3 implementation note explaining the gate-numbering choice
     (`format` surfaced separately; e2e collapsed into `test` until Plan 05+).
 - Tagged `v0.0.1-plan-01` at `5413dc2` (includes all fixes).
-- F03 (CI verified green) deferred to a follow-up: no GitHub remote configured for this
-  workspace yet. When a remote is added and the first push succeeds, flip F03's state
-  from `not_started` to `passing` and record the run URL as evidence.
+- F03 flipped to `passing`: repo pushed to https://github.com/carlomigueldy/dycode,
+  first CI run #26328241858 green in 24s (all 4 automated gates).
 - Next plan: Plan 02 — `@dycode/contracts` real Zod schemas + `@dycode/adapter-sdk` package.

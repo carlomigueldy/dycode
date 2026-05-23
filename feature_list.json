@@ -19,8 +19,8 @@
     "id": "F03",
     "behavior": "CI workflow runs verify.sh on push and PR and reports green.",
     "verification": "GitHub Actions workflow `CI` reports success on main",
-    "state": "not_started",
-    "evidence": null,
+    "state": "passing",
+    "evidence": "Run #26328241858 · 24s · all 4 gates green · https://github.com/carlomigueldy/dycode/actions/runs/26328241858",
     "blocked_by": null
   }
 ]
