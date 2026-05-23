@@ -27,12 +27,7 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": [
-        "src/**",
-        "tests/**",
-        "vitest.config.ts",
-        "package.json"
-      ]
+      "inputs": ["src/**", "tests/**", "vitest.config.ts", "package.json"]
     },
     "lint": {
       "outputs": [],
