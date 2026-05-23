@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DYCODE / Repo + Governance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: oklch(0.143 0.005 255);
+        --bg-elev-1: oklch(0.17 0.006 255);
+        --bg-elev-2: oklch(0.195 0.006 255);
+        --bg-elev-3: oklch(0.225 0.006 255);
+        --bg-mock: oklch(0.158 0.006 255);
+        --bg-mock-deep: oklch(0.125 0.006 255);
+        --border: oklch(0.27 0.006 255);
+        --border-bright: oklch(0.36 0.012 255);
+        --border-dim: oklch(0.22 0.006 255);
+        --fg: oklch(0.965 0.003 250);
+        --fg-muted: oklch(0.7 0.006 255);
+        --fg-subtle: oklch(0.55 0.006 255);
+        --fg-faint: oklch(0.4 0.006 255);
+        --accent: oklch(0.86 0.19 112);
+        --accent-glow: oklch(0.86 0.19 112 / 0.18);
+        --accent-dim: oklch(0.55 0.14 112);
+        --accent-warm: oklch(0.76 0.13 48);
+        --accent-cool: oklch(0.78 0.11 222);
+        --accent-violet: oklch(0.75 0.13 290);
+        --accent-pink: oklch(0.77 0.13 350);
+        --radius: 5px;
+        --radius-lg: 8px;
+        --font-mono: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>");
+        opacity: 0.5;
+        mix-blend-mode: overlay;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(
+          180deg,
+          transparent 0,
+          transparent calc(100% - 1px),
+          oklch(1 0 0 / 0.005) 100%
+        );
+        background-size: 100% 3px;
+        opacity: 0.4;
+      }
+      .shell {
+        position: relative;
+        z-index: 2;
+        max-width: 1360px;
+        margin: 0 auto;
+        padding: 0 24px 40px;
+      }
+
+      /* === STRIP === */
+      .system-strip {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 12px 0;
+        margin-bottom: 4px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+        letter-spacing: 0.06em;
+      }
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--fg);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+      .wordmark-glyph {
+        width: 14px;
+        height: 14px;
+        background: var(--accent);
+        border-radius: 1px;
+        position: relative;
+        box-shadow: 0 0 12px -2px var(--accent-glow);
+      }
+      .wordmark-glyph::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        background: var(--bg);
+        border-radius: 0.5px;
+      }
+      .crumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+      }
+      .crumbs .past {
+        color: var(--fg-faint);
+      }
+      .crumbs .current {
+        color: var(--accent);
+      }
+      .crumbs .arrow {
+        color: var(--fg-faint);
+      }
+      .crumbs .tag {
+        padding: 2px 7px;
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
+        border-radius: 2px;
+        background: oklch(0.21 0.05 112 / 0.15);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-left: auto;
+      }
+
+      /* === HEADER === */
+      .header {
+        padding: 36px 4px 24px;
+        position: relative;
+        border-bottom: 1px solid var(--border);
+      }
+      .header::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 36px;
+        width: 24px;
+        height: 1px;
+        background: var(--accent);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+        margin-left: 36px;
+      }
+      .title {
+        font-family: var(--font-mono);
+        font-size: 30px;
+        font-weight: 500;
+        letter-spacing: -0.012em;
+        line-height: 1.1;
+        color: var(--fg);
+        max-width: 900px;
+      }
+      .title .em {
+        color: var(--accent);
+      }
+      .title .slash {
+        color: var(--fg-faint);
+        font-weight: 400;
+      }
+      .subtitle {
+        font-family: var(--font-sans);
+        margin-top: 14px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--fg-muted);
+        max-width: 800px;
+      }
+      .subtitle code {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        background: var(--bg-elev-2);
+        padding: 1px 6px;
+        border-radius: 2px;
+        border: 1px solid var(--border);
+        color: var(--fg);
+      }
+
+      /* === Layout: tree + side panels === */
+      .grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 16px;
+        margin-top: 24px;
+      }
+      @media (max-width: 1100px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: var(--bg-elev-1);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(8px);
+        animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .panel:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .panel:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .panel:nth-child(3) {
+        animation-delay: 0.25s;
+      }
+      .panel:nth-child(4) {
+        animation-delay: 0.32s;
+      }
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-elev-2);
+      }
+      .panel-header h3 {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--fg);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .panel-header h3 .accent {
+        color: var(--accent);
+      }
+      .panel-header .meta {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.08em;
+      }
+
+      /* === TREE === */
+      .tree {
+        padding: 12px 16px 16px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.7;
+        color: var(--fg-muted);
+      }
+      .tree .row {
+        display: flex;
+        align-items: baseline;
+      }
+      .tree .row .glyph {
+        color: var(--fg-faint);
+        width: auto;
+        margin-right: 3px;
+        white-space: pre;
+      }
+      .tree .row .name {
+        color: var(--fg-muted);
+        font-weight: 500;
+      }
+      .tree .row .ext {
+        color: var(--fg-subtle);
+      }
+      .tree .row.dir .name {
+        color: var(--fg);
+        font-weight: 500;
+      }
+      .tree .row.dir.app .name {
+        color: var(--accent-cool);
+      }
+      .tree .row.dir.daemon .name {
+        color: var(--accent);
+      }
+      .tree .row.dir.shared .name {
+        color: var(--accent-violet);
+      }
+      .tree .row.dir.adapter .name {
+        color: var(--accent-warm);
+      }
+      .tree .row.dir.docs .name {
+        color: var(--accent-pink);
+      }
+      .tree .row .annotation {
+        color: var(--fg-faint);
+        font-size: 11px;
+        margin-left: auto;
+        padding-left: 16px;
+        font-weight: 400;
+        text-align: right;
+      }
+      .tree .row.highlight {
+        background: oklch(0.21 0.05 112 / 0.06);
+        border-left: 2px solid var(--accent);
+        margin-left: -16px;
+        padding-left: 14px;
+      }
+      .tree .row.highlight .annotation {
+        color: var(--accent);
+      }
+      .tree .sep {
+        height: 1px;
+        background: var(--border-dim);
+        margin: 4px 0;
+      }
+
+      /* Color legend */
+      .legend {
+        display: flex;
+        gap: 14px;
+        padding: 8px 16px 14px;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.04em;
+        border-top: 1px dashed var(--border-dim);
+      }
+      .legend .item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .legend .swatch {
+        width: 8px;
+        height: 8px;
+        border-radius: 1.5px;
+      }
+
+      /* === FILE preview (CLAUDE.md sample) === */
+      .file-preview {
+        background: var(--bg-mock);
+        border-top: 1px solid var(--border);
+        padding: 12px 16px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        line-height: 1.6;
+        color: var(--fg-muted);
+        max-height: 360px;
+        overflow: hidden;
+        position: relative;
+      }
+      .file-preview::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 60px;
+        background: linear-gradient(180deg, transparent, var(--bg-mock));
+        pointer-events: none;
+      }
+      .file-preview .ln {
+        display: inline-block;
+        width: 22px;
+        color: var(--fg-faint);
+        text-align: right;
+        margin-right: 10px;
+        font-size: 10px;
+      }
+      .file-preview .h1 {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .file-preview .h2 {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .file-preview .link {
+        color: var(--accent-cool);
+      }
+      .file-preview .com {
+        color: var(--fg-faint);
+      }
+      .file-preview .kw {
+        color: var(--accent-warm);
+      }
+      .file-preview .bullet {
+        color: var(--accent);
+      }
+
+      /* === Pipeline === */
+      .pipeline {
+        padding: 18px 18px 24px;
+      }
+      .pipeline-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr) auto;
+        gap: 6px;
+        align-items: stretch;
+        margin-bottom: 14px;
+      }
+      .stage {
+        background: var(--bg-elev-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 12px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .stage.pass {
+        border-color: var(--accent-dim);
+        background: oklch(0.21 0.05 112 / 0.08);
+      }
+      .stage.gate {
+        border-color: var(--accent-violet);
+        background: oklch(0.21 0.04 290 / 0.08);
+      }
+      .stage .num {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--fg-faint);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .stage .name {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--fg);
+        margin-top: 2px;
+      }
+      .stage.pass .name {
+        color: var(--accent);
+      }
+      .stage.gate .name {
+        color: var(--accent-violet);
+      }
+      .stage .cmd {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-muted);
+        margin-top: 4px;
+        background: var(--bg-mock-deep);
+        border: 1px solid var(--border-dim);
+        padding: 3px 6px;
+        border-radius: 2px;
+      }
+      .stage .gate-emoji {
+        position: absolute;
+        top: -7px;
+        right: 8px;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        background: var(--bg-elev-1);
+        color: var(--accent);
+        padding: 1px 6px;
+        border-radius: 999px;
+        border: 1px solid var(--accent-dim);
+        letter-spacing: 0.12em;
+      }
+      .stage.gate .gate-emoji {
+        color: var(--accent-violet);
+        border-color: oklch(0.5 0.1 290);
+      }
+      .arrow {
+        align-self: center;
+        color: var(--fg-faint);
+        font-size: 16px;
+      }
+
+      .gate-note {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+        line-height: 1.5;
+        padding: 12px 14px;
+        background: oklch(0.21 0.04 290 / 0.06);
+        border: 1px dashed oklch(0.5 0.1 290);
+        border-radius: var(--radius);
+        margin-top: 14px;
+      }
+      .gate-note b {
+        color: var(--accent-violet);
+      }
+      .gate-note .accent {
+        color: var(--accent);
+      }
+
+      /* === Feature list snippet === */
+      .feature-card {
+        background: var(--bg-mock);
+        border-top: 1px solid var(--border);
+        padding: 14px 16px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+      }
+      .feature-card pre {
+        line-height: 1.6;
+      }
+      .feature-card .key {
+        color: var(--accent-cool);
+      }
+      .feature-card .str {
+        color: var(--accent-warm);
+      }
+      .feature-card .state-passing {
+        color: var(--accent);
+      }
+      .feature-card .state-active {
+        color: var(--accent-warm);
+      }
+      .feature-card .state-blocked {
+        color: oklch(0.7 0.18 25);
+      }
+      .feature-card .punct {
+        color: var(--fg-faint);
+      }
+      .feature-card .com {
+        color: var(--fg-faint);
+        font-style: italic;
+      }
+
+      /* === Stats strip === */
+      .stats {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        background: var(--bg-elev-1);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px;
+      }
+      .stat .label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .stat .value {
+        font-family: var(--font-mono);
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--fg);
+      }
+      .stat .value .em {
+        color: var(--accent);
+      }
+      .stat .sub {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        color: var(--fg-muted);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
+      /* === Footer === */
+      .footer-meta {
+        margin-top: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+      }
+      .footer-meta .keys {
+        display: flex;
+        gap: 8px;
+      }
+      .footer-meta .keys .key {
+        border: 1px solid var(--border-bright);
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: var(--bg-elev-1);
+        color: var(--fg);
+      }
+      .accept-block {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .accept-pill {
+        background: var(--accent);
+        color: oklch(0.15 0.05 112);
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        border: none;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        box-shadow: 0 0 16px -2px var(--accent-glow);
+      }
+      .refine-pill {
+        background: var(--bg-elev-2);
+        color: var(--fg);
+        border: 1px solid var(--border-bright);
+        padding: 8px 18px;
+        border-radius: 999px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        cursor: pointer;
+        letter-spacing: 0.04em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="system-strip">
+        <div class="wordmark">
+          <span class="wordmark-glyph"></span>
+          <span>DYCODE</span>
+        </div>
+        <div class="crumbs">
+          <span class="past">Control Room ✓</span><span class="arrow">→</span>
+          <span class="past">Squads ✓</span><span class="arrow">→</span>
+          <span class="past">Daemon ✓</span><span class="arrow">→</span>
+          <span class="past">Harness ✓</span><span class="arrow">→</span>
+          <span class="past">Adapter SDK ✓</span><span class="arrow">→</span>
+          <span class="past">IPC ✓</span><span class="arrow">→</span>
+          <span class="past">Electron Shell ✓</span><span class="arrow">→</span>
+          <span class="current">Repo + Governance</span>
+        </div>
+        <span class="tag">07 / 07</span>
+      </div>
+
+      <header class="header">
+        <div class="eyebrow">07 / 07 · Repo Structure &amp; Quality Gates</div>
+        <h1 class="title">
+          One monorepo. <span class="em">Many harnesses.</span> <span class="slash">/</span>
+          The map is the truth.
+        </h1>
+        <p class="subtitle">
+          pnpm workspaces + Turborepo. Apache 2.0. Every package ships its own
+          <code>CLAUDE.md</code> and <code>AGENTS.md</code> as ≤100-line tables of contents into
+          <code>docs/</code>. Quality gates (typecheck · lint · unit · e2e · review verdict 10/10)
+          are the only path to <em>passing</em>. We eat our own dog food: the build of dycode runs
+          on the same harness primitives the product ships.
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- ─── REPO TREE ─── -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3><span class="accent">▾</span> dycode/ · MONOREPO TREE</h3>
+            <span class="meta">pnpm + turborepo · 14 packages</span>
+          </div>
+          <div class="tree">
+            <div class="row highlight">
+              <span class="glyph">├─</span><span class="name">CLAUDE.md</span>
+              <span class="annotation">≤100 lines · TOC into docs/</span>
+            </div>
+            <div class="row highlight">
+              <span class="glyph">├─</span><span class="name">AGENTS.md</span>
+              <span class="annotation">mirror — same map, agent-flavored</span>
+            </div>
+            <div class="row highlight">
+              <span class="glyph">├─</span><span class="name">feature_list.json</span>
+              <span class="annotation">scope + verification · machine-readable</span>
+            </div>
+            <div class="row highlight">
+              <span class="glyph">├─</span><span class="name">PROGRESS.md</span>
+              <span class="annotation">per-branch session log · must end clean</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">README.md</span>
+              <span class="annotation">human-facing overview</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">LICENSE</span>
+              <span class="annotation">Apache 2.0</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">CONTRIBUTING.md</span>
+              <span class="annotation">PR rules · review protocol</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">CODE_OF_CONDUCT.md</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">SECURITY.md</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">pnpm-workspace.yaml</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">turbo.json</span>
+              <span class="annotation">task graph · cached</span>
+            </div>
+            <div class="row">
+              <span class="glyph">├─</span><span class="name">tsconfig.base.json</span>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row dir app">
+              <span class="glyph">├─</span><span class="name">apps/</span>
+            </div>
+            <div class="row dir app">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">dycode/</span>
+              <span class="annotation">Electron app · renderer + main · shadcn</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;│&nbsp;&nbsp;├─</span
+              ><span class="name">electron/</span
+              ><span class="ext"> main.ts · preload.ts · sidecar.ts</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;│&nbsp;&nbsp;├─</span
+              ><span class="name">src/features/</span
+              ><span class="ext"> fleet · tasks · activity · settings · workspace</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;│&nbsp;&nbsp;├─</span
+              ><span class="name">CLAUDE.md</span><span class="ext"> + AGENTS.md</span>
+            </div>
+            <div class="row dir app">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">docs-site/</span>
+              <span class="annotation">public docs · Astro/VitePress</span>
+            </div>
+
+            <div class="row dir daemon">
+              <span class="glyph">├─</span><span class="name">daemons/</span>
+            </div>
+            <div class="row dir daemon">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">dycoded/</span>
+              <span class="annotation">Node daemon · sidecar binary</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/runtime/</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/orchestrator/</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/adapters/</span
+              ><span class="ext"> host · registry · adapter-api</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/domain/</span
+              ><span class="ext"> squad · pool · agent · task · workspace</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/persistence/</span
+              ><span class="ext"> better-sqlite3 + migrations/</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/detection/</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─</span
+              ><span class="name">src/telemetry/</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─</span
+              ><span class="name">CLAUDE.md</span><span class="ext"> + AGENTS.md</span>
+            </div>
+
+            <div class="row dir shared">
+              <span class="glyph">├─</span><span class="name">packages/</span>
+            </div>
+            <div class="row dir shared">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">@dycode/contracts</span>
+              <span class="annotation">Zod schemas · IPC + adapter types</span>
+            </div>
+            <div class="row dir shared">
+              <span class="glyph">│&nbsp;&nbsp;├─</span
+              ><span class="name">@dycode/adapter-sdk</span>
+              <span class="annotation">plugin contract · public API</span>
+            </div>
+            <div class="row dir shared">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">@dycode/ui</span>
+              <span class="annotation">shadcn + custom · shared components</span>
+            </div>
+            <div class="row dir shared">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">@dycode/ipc-client</span>
+              <span class="annotation">WS JSON-RPC client (typed)</span>
+            </div>
+
+            <div class="row dir adapter">
+              <span class="glyph">├─</span><span class="name">adapters/</span>
+              <span class="annotation">built-in (Apache 2.0)</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">claude-code/</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">codex/</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">opencode/</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">jest/</span
+              ><span class="ext"> · verifier</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">vitest/</span
+              ><span class="ext"> · verifier</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">tsc/</span
+              ><span class="ext"> · verifier</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">eslint/</span
+              ><span class="ext"> · verifier</span>
+            </div>
+            <div class="row dir adapter">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">playwright/</span
+              ><span class="ext"> · verifier</span>
+            </div>
+
+            <div class="row dir docs">
+              <span class="glyph">├─</span><span class="name">docs/</span>
+              <span class="annotation">deep docs — linked from CLAUDE/AGENTS maps</span>
+            </div>
+            <div class="row dir docs">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">architecture/</span>
+            </div>
+            <div class="row dir docs">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">adapters/</span>
+            </div>
+            <div class="row dir docs">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">ipc-protocol/</span>
+            </div>
+            <div class="row dir docs">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">governance/</span>
+            </div>
+            <div class="row dir docs">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">tutorials/</span>
+            </div>
+
+            <div class="row"><span class="glyph">├─</span><span class="name">scripts/</span></div>
+            <div class="row highlight">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">init.sh</span>
+              <span class="annotation">env probe · install · migrate · health</span>
+            </div>
+            <div class="row highlight">
+              <span class="glyph">│&nbsp;&nbsp;├─</span><span class="name">verify.sh</span>
+              <span class="annotation">tc → lint → unit → e2e · hard-fail</span>
+            </div>
+            <div class="row">
+              <span class="glyph">│&nbsp;&nbsp;└─</span><span class="name">new-adapter.ts</span
+              ><span class="ext"> scaffold</span>
+            </div>
+            <div class="row">
+              <span class="glyph">└─</span><span class="name">.github/workflows/</span
+              ><span class="ext"> ci.yml · release.yml · publish-adapters.yml</span>
+            </div>
+          </div>
+
+          <div class="legend">
+            <span class="item"
+              ><span class="swatch" style="background: var(--accent-cool)"></span>apps</span
+            >
+            <span class="item"
+              ><span class="swatch" style="background: var(--accent)"></span>daemon</span
+            >
+            <span class="item"
+              ><span class="swatch" style="background: var(--accent-violet)"></span>shared
+              packages</span
+            >
+            <span class="item"
+              ><span class="swatch" style="background: var(--accent-warm)"></span>adapters</span
+            >
+            <span class="item"
+              ><span class="swatch" style="background: var(--accent-pink)"></span>docs</span
+            >
+            <span class="item"
+              ><span
+                class="swatch"
+                style="background: var(--accent); box-shadow: 0 0 6px var(--accent-glow)"
+              ></span
+              >harness primitive</span
+            >
+          </div>
+        </div>
+
+        <!-- ─── RIGHT COLUMN ─── -->
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <!-- CLAUDE.md preview -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="accent">/</span> CLAUDE.md · ROOT</h3>
+              <span class="meta">93 lines · TOC pattern</span>
+            </div>
+            <div class="file-preview">
+              <div><span class="ln">1</span><span class="h1"># DYCODE — agent map</span></div>
+              <div><span class="ln">2</span></div>
+              <div>
+                <span class="ln">3</span
+                ><span class="com"
+                  >&gt; A multi-agent orchestration IDE. You are working on it.</span
+                >
+              </div>
+              <div>
+                <span class="ln">4</span
+                ><span class="com"
+                  >&gt; This file is the entry point. Stay here, follow links.</span
+                >
+              </div>
+              <div><span class="ln">5</span></div>
+              <div><span class="ln">6</span><span class="h2">## Stack</span></div>
+              <div>
+                <span class="ln">7</span>- Electron + TypeScript · React + shadcn + Tailwind v4
+              </div>
+              <div>
+                <span class="ln">8</span>- Node daemon (<span class="kw">dycoded</span>) · WS
+                JSON-RPC · SQLite
+              </div>
+              <div><span class="ln">9</span>- pnpm + Turborepo · Apache 2.0</div>
+              <div><span class="ln">10</span></div>
+              <div><span class="ln">11</span><span class="h2">## First commands</span></div>
+              <div>
+                <span class="ln">12</span><span class="bullet">$</span>
+                <span class="kw">./scripts/init.sh</span>
+                <span class="com"># verify env, install, migrate</span>
+              </div>
+              <div>
+                <span class="ln">13</span><span class="bullet">$</span>
+                <span class="kw">pnpm dev</span>
+                <span class="com"># renderer + daemon hot-reload</span>
+              </div>
+              <div>
+                <span class="ln">14</span><span class="bullet">$</span>
+                <span class="kw">./scripts/verify.sh</span>
+                <span class="com"># the only gate to 'done'</span>
+              </div>
+              <div><span class="ln">15</span></div>
+              <div><span class="ln">16</span><span class="h2">## Where to look</span></div>
+              <div>
+                <span class="ln">17</span>- High-level architecture
+                <span class="link">→ docs/architecture/overview.md</span>
+              </div>
+              <div>
+                <span class="ln">18</span>- IPC protocol
+                <span class="link">→ docs/ipc-protocol/spec.md</span>
+              </div>
+              <div>
+                <span class="ln">19</span>- Adapter SDK
+                <span class="link">→ docs/adapters/sdk.md</span>
+              </div>
+              <div>
+                <span class="ln">20</span>- Writing an adapter
+                <span class="link">→ docs/tutorials/adapter-quickstart.md</span>
+              </div>
+              <div>
+                <span class="ln">21</span>- UI components
+                <span class="link">→ packages/ui/CLAUDE.md</span>
+              </div>
+              <div>
+                <span class="ln">22</span>- Daemon internals
+                <span class="link">→ daemons/dycoded/CLAUDE.md</span>
+              </div>
+              <div><span class="ln">23</span></div>
+              <div><span class="ln">24</span><span class="h2">## Hard constraints</span></div>
+              <div>
+                <span class="ln">25</span>1. No PR merges unless
+                <span class="kw">verify.sh</span> exits 0.
+              </div>
+              <div>
+                <span class="ln">26</span>2. Reviewer verdict ≥ 10/10 required to promote a task.
+              </div>
+              <div>
+                <span class="ln">27</span>3. Update relevant CLAUDE.md / AGENTS.md in the same PR.
+              </div>
+              <div>
+                <span class="ln">28</span>4. Touch <span class="kw">feature_list.json</span> when
+                adding/closing scope.
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="accent">▸</span> QUALITY GATES · CI + LOCAL</h3>
+              <span class="meta">same commands · everywhere</span>
+            </div>
+            <div class="pipeline">
+              <div class="pipeline-row">
+                <div class="stage pass">
+                  <span class="gate-emoji">EXIT 0</span>
+                  <span class="num">STAGE 01</span>
+                  <span class="name">Typecheck</span>
+                  <span class="cmd">pnpm typecheck</span>
+                </div>
+                <div class="stage pass">
+                  <span class="gate-emoji">EXIT 0</span>
+                  <span class="num">STAGE 02</span>
+                  <span class="name">Lint</span>
+                  <span class="cmd">pnpm lint</span>
+                </div>
+                <div class="stage pass">
+                  <span class="gate-emoji">EXIT 0</span>
+                  <span class="num">STAGE 03</span>
+                  <span class="name">Unit</span>
+                  <span class="cmd">pnpm test</span>
+                </div>
+                <div class="stage pass">
+                  <span class="gate-emoji">EXIT 0</span>
+                  <span class="num">STAGE 04</span>
+                  <span class="name">E2E</span>
+                  <span class="cmd">pnpm test:e2e</span>
+                </div>
+                <div class="stage gate">
+                  <span class="gate-emoji">10 / 10</span>
+                  <span class="num">STAGE 05</span>
+                  <span class="name">Review</span>
+                  <span class="cmd">reviewer verdict</span>
+                </div>
+              </div>
+              <div class="gate-note">
+                <b>Gates 1–4</b> automated · CI enforces ·
+                <span class="accent">verify.sh</span> runs the same locally. <b>Gate 5</b> human or
+                agent reviewer — verdict <span class="accent">must be 10/10</span> on consistency ·
+                scalability · maintainability · correctness. Anything below blocks the task in
+                <code
+                  style="
+                    font-family: var(--font-mono);
+                    background: var(--bg-mock-deep);
+                    padding: 0 4px;
+                    border-radius: 2px;
+                    color: var(--fg);
+                  "
+                  >active</code
+                >
+                and forces revisions.
+              </div>
+            </div>
+          </div>
+
+          <!-- feature_list.json -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="accent">[ ]</span> feature_list.json · SCOPE TRUTH</h3>
+              <span class="meta">machine-readable · gates state</span>
+            </div>
+            <div class="feature-card">
+              <pre>[
+  <span class="punct">{</span>
+    <span class="key">"id"</span><span class="punct">:</span> <span class="str">"F01"</span><span class="punct">,</span>
+    <span class="key">"behavior"</span><span class="punct">:</span> <span class="str">"Electron app launches with sidecar dycoded"</span><span class="punct">,</span>
+    <span class="key">"verification"</span><span class="punct">:</span> <span class="str">"pnpm test:e2e -- boot.spec"</span><span class="punct">,</span>
+    <span class="key">"state"</span><span class="punct">:</span> <span class="str state-passing">"passing"</span><span class="punct">,</span>
+    <span class="key">"evidence"</span><span class="punct">:</span> <span class="str">"commit a7f3 · run #142"</span>
+  <span class="punct">},</span>
+  <span class="punct">{</span>
+    <span class="key">"id"</span><span class="punct">:</span> <span class="str">"F02"</span><span class="punct">,</span>
+    <span class="key">"behavior"</span><span class="punct">:</span> <span class="str">"Runtime detection finds claude-code on PATH"</span><span class="punct">,</span>
+    <span class="key">"verification"</span><span class="punct">:</span> <span class="str">"pnpm test detection/path-scanner"</span><span class="punct">,</span>
+    <span class="key">"state"</span><span class="punct">:</span> <span class="str state-passing">"passing"</span>
+  <span class="punct">},</span>
+  <span class="punct">{</span>
+    <span class="key">"id"</span><span class="punct">:</span> <span class="str">"F03"</span><span class="punct">,</span>
+    <span class="key">"behavior"</span><span class="punct">:</span> <span class="str">"Promote agent from pool into a squad"</span><span class="punct">,</span>
+    <span class="key">"verification"</span><span class="punct">:</span> <span class="str">"pnpm test:e2e -- pool-promote.spec"</span><span class="punct">,</span>
+    <span class="key">"state"</span><span class="punct">:</span> <span class="str state-active">"active"</span>
+  <span class="punct">},</span>
+  <span class="punct">{</span>
+    <span class="key">"id"</span><span class="punct">:</span> <span class="str">"F04"</span><span class="punct">,</span>
+    <span class="key">"behavior"</span><span class="punct">:</span> <span class="str">"Handoff persists across daemon restart"</span><span class="punct">,</span>
+    <span class="key">"verification"</span><span class="punct">:</span> <span class="str">"pnpm test:e2e -- handoff-restart.spec"</span><span class="punct">,</span>
+    <span class="key">"state"</span><span class="punct">:</span> <span class="str state-blocked">"blocked"</span><span class="punct">,</span>
+    <span class="key">"blocked_by"</span><span class="punct">:</span> <span class="str">"F03"</span>
+  <span class="punct">}</span>
+]</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="stats">
+        <div class="stat">
+          <div class="label">LICENSE</div>
+          <div class="value">Apache <span class="em">2.0</span></div>
+          <div class="sub">Patent grant + permissive · enterprise-friendly</div>
+        </div>
+        <div class="stat">
+          <div class="label">PACKAGES</div>
+          <div class="value">14<span class="em">+</span></div>
+          <div class="sub">2 apps · 1 daemon · 4 shared · 8 built-in adapters</div>
+        </div>
+        <div class="stat">
+          <div class="label">MAPS</div>
+          <div class="value">N <span class="em">CLAUDE.md</span></div>
+          <div class="sub">
+            One per package · all ≤100 lines · linked into
+            <span style="color: var(--accent)">docs/</span>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="label">GATES TO "DONE"</div>
+          <div class="value">5 <span class="em">/ 5</span></div>
+          <div class="sub">tc · lint · unit · e2e · reviewer 10/10</div>
+        </div>
+      </div>
+
+      <div class="footer-meta">
+        <div>
+          <span style="color: var(--fg-faint); letter-spacing: 0.18em">PRESS</span>
+          <span style="margin: 0 8px"></span>
+          <span class="keys">
+            <span class="key">A</span>
+            <span class="key">B</span>
+          </span>
+          <span style="margin-left: 8px; color: var(--fg-faint)">to vote</span>
+        </div>
+        <div class="accept-block">
+          <span data-choice="refine" onclick="toggleSelect(this)" class="refine-pill"
+            >B · NEEDS REFINE</span
+          >
+          <span data-choice="lgtm" onclick="toggleSelect(this)" class="accept-pill"
+            >A · LGTM →</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'a' || e.key === 'A') document.querySelector('[data-choice="lgtm"]').click()
+        else if (e.key === 'b' || e.key === 'B')
+          document.querySelector('[data-choice="refine"]').click()
+      })
+    </script>
+  </body>
+</html>

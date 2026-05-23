@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DYCODE / Orchestration Topology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: oklch(0.143 0.005 255);
+        --bg-elev: oklch(0.182 0.006 255);
+        --bg-card: oklch(0.205 0.006 255);
+        --bg-card-hover: oklch(0.232 0.006 255);
+        --bg-mock: oklch(0.158 0.006 255);
+        --bg-mock-elev: oklch(0.208 0.006 255);
+        --bg-mock-deep: oklch(0.125 0.006 255);
+        --border: oklch(0.27 0.006 255);
+        --border-bright: oklch(0.4 0.012 255);
+        --fg: oklch(0.965 0.003 250);
+        --fg-muted: oklch(0.66 0.006 255);
+        --fg-subtle: oklch(0.48 0.006 255);
+        --fg-faint: oklch(0.38 0.006 255);
+        --accent: oklch(0.86 0.19 112);
+        --accent-glow: oklch(0.86 0.19 112 / 0.18);
+        --accent-dim: oklch(0.55 0.14 112);
+        --accent-warm: oklch(0.76 0.13 48);
+        --accent-warm-dim: oklch(0.5 0.11 48);
+        --accent-cool: oklch(0.78 0.11 222);
+        --accent-violet: oklch(0.75 0.13 290);
+        --accent-pink: oklch(0.77 0.13 350);
+        --radius-xs: 2px;
+        --radius-sm: 3px;
+        --radius: 5px;
+        --radius-lg: 8px;
+        --font-mono: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --shadow-card: 0 1px 0 oklch(1 0 0 / 0.02), 0 0 0 1px var(--border);
+        --shadow-card-active:
+          0 1px 0 oklch(1 0 0 / 0.04), 0 0 0 1px var(--border-bright),
+          0 0 32px -8px var(--accent-glow);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-feature-settings: 'ss01', 'ss02', 'cv11';
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>");
+        opacity: 0.55;
+        mix-blend-mode: overlay;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(
+          180deg,
+          transparent 0,
+          transparent calc(100% - 1px),
+          oklch(1 0 0 / 0.005) 100%
+        );
+        background-size: 100% 3px;
+        opacity: 0.4;
+      }
+
+      .shell {
+        position: relative;
+        z-index: 2;
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      /* === SYSTEM STRIP === */
+      .system-strip {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 12px 28px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, oklch(0.165 0.006 255) 0%, var(--bg) 100%);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+      }
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--fg);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .wordmark-glyph {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        background: var(--accent);
+        border-radius: 1px;
+        position: relative;
+        box-shadow: 0 0 12px -2px var(--accent-glow);
+      }
+      .wordmark-glyph::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        background: var(--bg);
+        border-radius: 0.5px;
+      }
+      .system-sep {
+        width: 1px;
+        height: 14px;
+        background: var(--border-bright);
+      }
+      .crumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--fg-muted);
+        flex: 1;
+      }
+      .crumbs .past {
+        color: var(--fg-faint);
+      }
+      .crumbs .current {
+        color: var(--fg);
+      }
+      .crumbs .arrow {
+        color: var(--fg-faint);
+      }
+      .crumbs .tag {
+        font-size: 10px;
+        padding: 2px 6px;
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
+        border-radius: 2px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-left: 6px;
+      }
+      .system-meta {
+        color: var(--fg-subtle);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--fg-faint);
+        display: inline-block;
+      }
+      .dot.live {
+        background: var(--accent);
+        box-shadow: 0 0 6px var(--accent-glow);
+        animation: blink 1.6s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* === HEADER === */
+      .header {
+        padding: 60px 28px 36px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .header::before {
+        content: '';
+        position: absolute;
+        left: 28px;
+        top: 60px;
+        width: 24px;
+        height: 1px;
+        background: var(--accent);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+        margin-left: 36px;
+        display: inline-block;
+      }
+      .title {
+        font-family: var(--font-mono);
+        font-size: 38px;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        line-height: 1.08;
+        color: var(--fg);
+        max-width: 920px;
+      }
+      .title .em {
+        color: var(--accent);
+      }
+      .title .slash {
+        color: var(--fg-faint);
+        font-weight: 400;
+      }
+      .subtitle {
+        font-family: var(--font-sans);
+        margin-top: 18px;
+        font-size: 15px;
+        line-height: 1.55;
+        color: var(--fg-muted);
+        max-width: 760px;
+        font-weight: 400;
+      }
+      .subtitle code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--bg-card);
+        padding: 1px 6px;
+        border-radius: var(--radius-xs);
+        border: 1px solid var(--border);
+        color: var(--fg);
+      }
+
+      /* === CARDS === */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 32px 28px 24px;
+      }
+      @media (max-width: 1100px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.2s ease;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .card:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.25s;
+      }
+      @keyframes cardIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .card:hover {
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+      }
+      .card.selected {
+        box-shadow: var(--shadow-card-active);
+        background: var(--bg-card-hover);
+      }
+      .card.selected::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+      }
+
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 18px 18px 14px;
+        gap: 12px;
+      }
+      .card-numbering {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--fg-subtle);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .card-numbering b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .card-tag {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 600;
+        padding: 3px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--border-bright);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        background: oklch(1 0 0 / 0.02);
+      }
+      .card-tag.stable {
+        color: var(--accent-cool);
+        border-color: oklch(0.5 0.08 222);
+      }
+      .card-tag.role {
+        color: var(--accent-violet);
+        border-color: oklch(0.5 0.1 290);
+      }
+      .card-tag.hybrid {
+        color: var(--accent);
+        border-color: var(--accent-dim);
+      }
+
+      .card-rec {
+        margin-left: auto;
+        margin-top: 2px;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      /* === FLEET MOCK === */
+      .card-mock {
+        margin: 0 18px;
+        aspect-ratio: 16 / 11;
+        background: var(--bg-mock);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        line-height: 1.4;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mock-titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg-mock-elev);
+        padding: 5px 8px;
+        border-bottom: 1px solid var(--border);
+        font-size: 8px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .mock-titlebar .left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .mock-titlebar .traffic {
+        display: inline-flex;
+        gap: 3px;
+      }
+      .mock-titlebar .traffic span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--border-bright);
+      }
+      .mock-titlebar .right {
+        color: var(--accent);
+        font-size: 7px;
+        letter-spacing: 0.14em;
+      }
+
+      .mock-tabs {
+        display: flex;
+        gap: 14px;
+        padding: 4px 8px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-mock-deep);
+        font-size: 8px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .mock-tabs .active {
+        color: var(--fg);
+        position: relative;
+      }
+      .mock-tabs .active::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -5px;
+        height: 1px;
+        background: var(--accent);
+      }
+
+      .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5px 8px 3px;
+        color: var(--fg-subtle);
+        font-size: 7.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        border-bottom: 1px dashed oklch(0.22 0.006 255 / 0.6);
+      }
+      .group-header b {
+        color: var(--fg);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+      }
+      .group-header .badge {
+        color: var(--accent-warm);
+        font-size: 6.5px;
+        border: 1px solid var(--accent-warm-dim);
+        padding: 1px 4px;
+        border-radius: 2px;
+        letter-spacing: 0.14em;
+      }
+      .group-header .badge.role {
+        color: var(--accent-violet);
+        border-color: oklch(0.5 0.1 290);
+      }
+      .group-header .badge.pool {
+        color: var(--accent-cool);
+        border-color: oklch(0.5 0.08 222);
+      }
+      .group-header .leader {
+        color: var(--accent);
+        font-size: 6.5px;
+        letter-spacing: 0.1em;
+      }
+      .group-header .leader b {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .agent-row {
+        display: grid;
+        grid-template-columns: 14px 1fr auto;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 8px;
+        border-bottom: 1px solid oklch(0.22 0.006 255 / 0.45);
+        font-size: 7.5px;
+      }
+      .agent-row:last-of-type {
+        border-bottom: none;
+      }
+      .agent-row .status {
+        width: 5.5px;
+        height: 5.5px;
+        border-radius: 50%;
+        justify-self: center;
+        background: var(--fg-faint);
+      }
+      .agent-row .status.live {
+        background: var(--accent);
+        box-shadow: 0 0 5px var(--accent-glow);
+        animation: blink 1.6s infinite;
+      }
+      .agent-row .status.queue {
+        background: var(--accent-warm);
+      }
+      .agent-row .info {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+      .agent-row .name {
+        color: var(--fg);
+        font-weight: 500;
+        font-size: 8px;
+      }
+      .agent-row .role-tag {
+        color: var(--accent-violet);
+        font-size: 6.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        border: 1px solid oklch(0.5 0.1 290);
+        padding: 0 4px;
+        border-radius: 2px;
+      }
+      .agent-row .cap-chip {
+        color: var(--fg-muted);
+        font-size: 6.5px;
+        letter-spacing: 0.04em;
+        background: oklch(0.22 0.006 255 / 0.5);
+        border: 1px solid var(--border);
+        padding: 0 4px;
+        border-radius: 2px;
+      }
+      .agent-row .meta {
+        color: var(--fg-subtle);
+        font-size: 6.5px;
+        text-align: right;
+      }
+      .agent-row.leader-row {
+        background: oklch(0.86 0.19 112 / 0.04);
+      }
+      .agent-row.leader-row .name {
+        color: var(--accent);
+      }
+      .agent-row.leader-row::before {
+        content: '★';
+        color: var(--accent);
+        font-size: 8px;
+        margin-right: -8px;
+        margin-left: -10px;
+        width: 10px;
+        text-align: center;
+      }
+
+      .agent-row .indent-dash {
+        color: var(--fg-faint);
+        margin-right: 3px;
+      }
+
+      /* Pool variant */
+      .pool-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        padding: 6px 8px;
+      }
+      .pool-cell {
+        background: var(--bg-mock-elev);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 4px 6px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 7.5px;
+      }
+      .pool-cell .name {
+        color: var(--fg);
+        font-weight: 500;
+        font-size: 8px;
+      }
+      .pool-cell .cap {
+        color: var(--fg-subtle);
+        font-size: 6.5px;
+        margin-left: auto;
+        letter-spacing: 0.04em;
+      }
+
+      /* Footer label inside mock */
+      .mock-footer-label {
+        margin-top: auto;
+        padding: 4px 8px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-mock-deep);
+        color: var(--fg-subtle);
+        font-size: 6.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mock-footer-label .accent-text {
+        color: var(--accent);
+      }
+
+      /* === CARD BODY === */
+      .card-body {
+        padding: 16px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        margin-top: 14px;
+      }
+      .card-title {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--fg);
+      }
+      .card-desc {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--fg-muted);
+      }
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .meta-chip {
+        font-family: var(--font-mono);
+        font-size: 9.5px;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: oklch(0.22 0.006 255 / 0.7);
+        border: 1px solid var(--border);
+        color: var(--fg-muted);
+        letter-spacing: 0.02em;
+      }
+      .card-bestfor {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.05em;
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+        margin-top: 4px;
+      }
+      .card-bestfor .label {
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 9px;
+        margin-right: 6px;
+      }
+
+      /* === FOOTER === */
+      .footer {
+        padding: 24px 28px 36px;
+        border-top: 1px solid var(--border);
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .footer-msg {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+        letter-spacing: 0.04em;
+      }
+      .footer-msg .accent {
+        color: var(--accent);
+      }
+      .footer-msg b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .footer-kbd {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .footer-kbd .key {
+        border: 1px solid var(--border-bright);
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: var(--bg-card);
+        color: var(--fg);
+      }
+      #indicator-text {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+        letter-spacing: 0.04em;
+      }
+      #indicator-text .selected-text {
+        color: var(--accent);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <!-- SYSTEM STRIP / breadcrumb -->
+      <div class="system-strip">
+        <div class="wordmark">
+          <span class="wordmark-glyph"></span>
+          <span>DYCODE</span>
+        </div>
+        <span class="system-sep"></span>
+        <div class="crumbs">
+          <span class="past">Product shape</span>
+          <span class="arrow">→</span>
+          <span class="past">Control Room ✓</span>
+          <span class="arrow">→</span>
+          <span class="current">Topology</span>
+          <span class="tag">02 / 03</span>
+        </div>
+        <span class="system-meta">5 RUNTIMES · LIVE</span>
+      </div>
+
+      <!-- HEADER -->
+      <header class="header">
+        <div class="eyebrow">02 / 06 · Agent Organization</div>
+        <h1 class="title">
+          How is the fleet <span class="em">organized</span>? <span class="slash">/</span>
+          Stable groups, role crews, or hybrid.
+        </h1>
+        <p class="subtitle">
+          The Control Room renders agents under <em>some</em> structure. This decision determines
+          what the fleet view groups by, how work routes to a worker, and whether the user
+          pre-defines groups or the system assembles them per-task. It also dictates which shadcn
+          primitives carry the load — <code>Sidebar</code> with collapsible groups,
+          <code>Command</code> for crew composition, or both.
+        </p>
+      </header>
+
+      <!-- CARDS -->
+      <div class="cards-grid">
+        <!-- ========== A: DOMAIN SQUADS ========== -->
+        <div class="card" data-choice="domain-squads" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION A</b> · 01</div>
+            <div class="card-tag stable">Stable groups</div>
+          </div>
+
+          <div class="card-mock">
+            <div class="mock-titlebar">
+              <div class="left">
+                <span class="traffic"><span></span><span></span><span></span></span>
+                <span>dycode · fleet</span>
+              </div>
+              <div class="right">3 SQUADS</div>
+            </div>
+
+            <div class="mock-tabs">
+              <span class="active">Fleet</span>
+              <span>Tasks</span>
+              <span>Activity</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>SQUAD</b> · backend</span>
+              <span class="leader">★ leader <b>claude-code</b></span>
+            </div>
+            <div class="agent-row leader-row">
+              <span class="status live"></span>
+              <div class="info"><span class="name">claude-code</span></div>
+              <span class="meta">/api/users POST</span>
+            </div>
+            <div class="agent-row">
+              <span class="status live"></span>
+              <div class="info">
+                <span class="indent-dash">└</span><span class="name">codex</span>
+              </div>
+              <span class="meta">handler tests</span>
+            </div>
+            <div class="agent-row">
+              <span class="status queue"></span>
+              <div class="info">
+                <span class="indent-dash">└</span><span class="name">hermes</span>
+              </div>
+              <span class="meta">queued</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>SQUAD</b> · frontend</span>
+              <span class="leader">★ leader <b>opencode</b></span>
+            </div>
+            <div class="agent-row leader-row">
+              <span class="status live"></span>
+              <div class="info"><span class="name">opencode</span></div>
+              <span class="meta">UserCard.tsx</span>
+            </div>
+            <div class="agent-row">
+              <span class="status"></span>
+              <div class="info">
+                <span class="indent-dash">└</span><span class="name">openclaw</span>
+              </div>
+              <span class="meta">idle</span>
+            </div>
+
+            <div class="mock-footer-label">
+              <span>ROUTING · TASK → SQUAD → LEADER PICKS</span>
+              <span class="accent-text">multica-style</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Domain Squads</h3>
+            <p class="card-desc">
+              Pre-defined groups by area (backend, frontend, infra…). Each squad has a leader who
+              routes incoming tasks to the right worker. Stable membership; agents have homes.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">Persistent groups</span>
+              <span class="meta-chip">Leader-routed</span>
+              <span class="meta-chip">Domain-shaped</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Predictable, ongoing workstreams (you already know
+              who handles backend)
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== B: ROLE CREWS ========== -->
+        <div class="card" data-choice="role-crews" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION B</b> · 02</div>
+            <div class="card-tag role">Per-task assembly</div>
+          </div>
+
+          <div class="card-mock">
+            <div class="mock-titlebar">
+              <div class="left">
+                <span class="traffic"><span></span><span></span><span></span></span>
+                <span>dycode · fleet</span>
+              </div>
+              <div class="right">2 CREWS</div>
+            </div>
+
+            <div class="mock-tabs">
+              <span class="active">Fleet</span>
+              <span>Tasks</span>
+              <span>Activity</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>CREW</b> · feat/payment-flow</span>
+              <span class="badge role">ad-hoc</span>
+            </div>
+            <div class="agent-row">
+              <span class="status live"></span>
+              <div class="info">
+                <span class="role-tag">Plan</span><span class="name">claude-code</span>
+              </div>
+              <span class="meta">decompose</span>
+            </div>
+            <div class="agent-row">
+              <span class="status live"></span>
+              <div class="info">
+                <span class="role-tag">Code</span><span class="name">codex</span>
+              </div>
+              <span class="meta">implement</span>
+            </div>
+            <div class="agent-row">
+              <span class="status queue"></span>
+              <div class="info">
+                <span class="role-tag">Test</span><span class="name">hermes</span>
+              </div>
+              <span class="meta">queued</span>
+            </div>
+            <div class="agent-row">
+              <span class="status"></span>
+              <div class="info">
+                <span class="role-tag">Rev</span><span class="name">openclaw</span>
+              </div>
+              <span class="meta">idle</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>CREW</b> · feat/user-dash</span>
+              <span class="badge role">ad-hoc</span>
+            </div>
+            <div class="agent-row">
+              <span class="status live"></span>
+              <div class="info">
+                <span class="role-tag">Plan</span><span class="name">claude-code</span>
+              </div>
+              <span class="meta">drafting</span>
+            </div>
+            <div class="agent-row">
+              <span class="status"></span>
+              <div class="info">
+                <span class="role-tag">Code</span><span class="name">opencode</span>
+              </div>
+              <span class="meta">idle</span>
+            </div>
+
+            <div class="mock-footer-label">
+              <span>ROUTING · TASK → ROLES → SYSTEM PICKS</span>
+              <span class="accent-text">CrewAI-style</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Role Crews</h3>
+            <p class="card-desc">
+              Per-task groups assembled by <em>function</em>: Planner, Coder, Tester, Reviewer. You
+              define a task, the system fills each role from available runtimes based on capability
+              tags. Crews dissolve when the task closes.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">Function-shaped</span>
+              <span class="meta-chip">Per-task</span>
+              <span class="meta-chip">Auto-fill roles</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Feature-shaped work with clear
+              plan/code/test/review phases
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== C: HYBRID ========== -->
+        <div class="card" data-choice="hybrid" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION C</b> · 03</div>
+            <div class="card-tag hybrid">Squads + Pool</div>
+            <div class="card-rec">★ Recommended</div>
+          </div>
+
+          <div class="card-mock">
+            <div class="mock-titlebar">
+              <div class="left">
+                <span class="traffic"><span></span><span></span><span></span></span>
+                <span>dycode · fleet</span>
+              </div>
+              <div class="right">2 SQUADS · POOL</div>
+            </div>
+
+            <div class="mock-tabs">
+              <span class="active">Fleet</span>
+              <span>Tasks</span>
+              <span>Activity</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>SQUAD</b> · backend</span>
+              <span class="leader">★ <b>claude-code</b></span>
+            </div>
+            <div class="agent-row leader-row">
+              <span class="status live"></span>
+              <div class="info"><span class="name">claude-code</span></div>
+              <span class="meta">/api/users</span>
+            </div>
+            <div class="agent-row">
+              <span class="status live"></span>
+              <div class="info">
+                <span class="indent-dash">└</span><span class="name">codex</span>
+              </div>
+              <span class="meta">tests</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>SQUAD</b> · frontend</span>
+              <span class="leader">★ <b>opencode</b></span>
+            </div>
+            <div class="agent-row leader-row">
+              <span class="status live"></span>
+              <div class="info"><span class="name">opencode</span></div>
+              <span class="meta">UserCard</span>
+            </div>
+
+            <div class="group-header">
+              <span><b>POOL</b> · available</span>
+              <span class="badge pool">ad-hoc</span>
+            </div>
+            <div style="padding: 4px 8px">
+              <div style="display: flex; gap: 4px; flex-wrap: wrap">
+                <span
+                  class="cap-chip"
+                  style="
+                    font-size: 7px;
+                    padding: 2px 5px;
+                    background: var(--bg-mock-elev);
+                    border: 1px solid var(--border-bright);
+                    border-radius: 2px;
+                    color: var(--fg);
+                  "
+                  >hermes <span class="dot live" style="margin-left: 3px"></span
+                ></span>
+                <span
+                  class="cap-chip"
+                  style="
+                    font-size: 7px;
+                    padding: 2px 5px;
+                    background: var(--bg-mock-elev);
+                    border: 1px solid var(--border-bright);
+                    border-radius: 2px;
+                    color: var(--fg-muted);
+                  "
+                  >openclaw <span class="dot" style="margin-left: 3px"></span
+                ></span>
+                <span
+                  class="cap-chip"
+                  style="
+                    font-size: 7px;
+                    padding: 2px 5px;
+                    background: var(--bg-mock-elev);
+                    border: 1px solid var(--border-bright);
+                    border-radius: 2px;
+                    color: var(--fg-muted);
+                  "
+                  >gemini <span class="dot" style="margin-left: 3px"></span
+                ></span>
+              </div>
+            </div>
+
+            <div class="mock-footer-label">
+              <span>ROUTING · SQUAD FIRST, POOL FOR ONE-OFFS</span>
+              <span class="accent-text">flexible</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Squads + Free Pool</h3>
+            <p class="card-desc">
+              Stable squads for your ongoing workstreams, plus a free <em>pool</em> of unassigned
+              runtimes you can grab for one-off tasks. Drag from pool into a squad to promote;
+              release back to pool when done. Best of both worlds without locking you into
+              role-shaped tasks.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">Persistent + ad-hoc</span>
+              <span class="meta-chip">Drag-to-promote</span>
+              <span class="meta-chip">Capability tags</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Real-world mix: ongoing teams + occasional one-off
+              jobs
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div id="indicator-text">Click an option above, then return to the terminal</div>
+        <div class="footer-kbd">
+          <span class="key">A</span><span class="key">B</span><span class="key">C</span>
+          <span>to select</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('keydown', (e) => {
+        const map = { a: 0, b: 1, c: 2, A: 0, B: 1, C: 2 }
+        if (map[e.key] !== undefined) {
+          const cards = document.querySelectorAll('.card')
+          const card = cards[map[e.key]]
+          if (card) {
+            card.click()
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }
+      })
+    </script>
+  </body>
+</html>

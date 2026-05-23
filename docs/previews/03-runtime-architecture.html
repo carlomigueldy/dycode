@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DYCODE / Runtime Architecture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: oklch(0.143 0.005 255);
+        --bg-elev: oklch(0.182 0.006 255);
+        --bg-card: oklch(0.205 0.006 255);
+        --bg-card-hover: oklch(0.232 0.006 255);
+        --bg-mock: oklch(0.158 0.006 255);
+        --bg-mock-elev: oklch(0.208 0.006 255);
+        --bg-mock-deep: oklch(0.125 0.006 255);
+        --border: oklch(0.27 0.006 255);
+        --border-bright: oklch(0.4 0.012 255);
+        --fg: oklch(0.965 0.003 250);
+        --fg-muted: oklch(0.66 0.006 255);
+        --fg-subtle: oklch(0.48 0.006 255);
+        --fg-faint: oklch(0.38 0.006 255);
+        --accent: oklch(0.86 0.19 112);
+        --accent-glow: oklch(0.86 0.19 112 / 0.18);
+        --accent-dim: oklch(0.55 0.14 112);
+        --accent-warm: oklch(0.76 0.13 48);
+        --accent-cool: oklch(0.78 0.11 222);
+        --accent-violet: oklch(0.75 0.13 290);
+        --radius-xs: 2px;
+        --radius-sm: 3px;
+        --radius: 5px;
+        --radius-lg: 8px;
+        --font-mono: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+        --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+        --shadow-card: 0 1px 0 oklch(1 0 0 / 0.02), 0 0 0 1px var(--border);
+        --shadow-card-active:
+          0 1px 0 oklch(1 0 0 / 0.04), 0 0 0 1px var(--border-bright),
+          0 0 32px -8px var(--accent-glow);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: var(--font-sans);
+        font-feature-settings: 'ss01', 'ss02', 'cv11';
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.04 0'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>");
+        opacity: 0.55;
+        mix-blend-mode: overlay;
+      }
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(
+          180deg,
+          transparent 0,
+          transparent calc(100% - 1px),
+          oklch(1 0 0 / 0.005) 100%
+        );
+        background-size: 100% 3px;
+        opacity: 0.4;
+      }
+      .shell {
+        position: relative;
+        z-index: 2;
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      /* === SYSTEM STRIP === */
+      .system-strip {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 12px 28px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, oklch(0.165 0.006 255) 0%, var(--bg) 100%);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+      }
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--fg);
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .wordmark-glyph {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        background: var(--accent);
+        border-radius: 1px;
+        position: relative;
+        box-shadow: 0 0 12px -2px var(--accent-glow);
+      }
+      .wordmark-glyph::after {
+        content: '';
+        position: absolute;
+        inset: 3px;
+        background: var(--bg);
+        border-radius: 0.5px;
+      }
+      .system-sep {
+        width: 1px;
+        height: 14px;
+        background: var(--border-bright);
+      }
+      .crumbs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--fg-muted);
+        flex: 1;
+      }
+      .crumbs .past {
+        color: var(--fg-faint);
+      }
+      .crumbs .current {
+        color: var(--fg);
+      }
+      .crumbs .arrow {
+        color: var(--fg-faint);
+      }
+      .crumbs .tag {
+        font-size: 10px;
+        padding: 2px 6px;
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
+        border-radius: 2px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-left: 6px;
+      }
+      .system-meta {
+        color: var(--fg-subtle);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      /* === HEADER === */
+      .header {
+        padding: 60px 28px 36px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .header::before {
+        content: '';
+        position: absolute;
+        left: 28px;
+        top: 60px;
+        width: 24px;
+        height: 1px;
+        background: var(--accent);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 16px;
+        margin-left: 36px;
+        display: inline-block;
+      }
+      .title {
+        font-family: var(--font-mono);
+        font-size: 38px;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        line-height: 1.08;
+        color: var(--fg);
+        max-width: 920px;
+      }
+      .title .em {
+        color: var(--accent);
+      }
+      .title .slash {
+        color: var(--fg-faint);
+        font-weight: 400;
+      }
+      .subtitle {
+        font-family: var(--font-sans);
+        margin-top: 18px;
+        font-size: 15px;
+        line-height: 1.55;
+        color: var(--fg-muted);
+        max-width: 760px;
+        font-weight: 400;
+      }
+      .subtitle code {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        background: var(--bg-card);
+        padding: 1px 6px;
+        border-radius: var(--radius-xs);
+        border: 1px solid var(--border);
+        color: var(--fg);
+      }
+
+      /* === CARDS === */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 32px 28px 24px;
+      }
+      @media (max-width: 1100px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.2s ease;
+        opacity: 0;
+        transform: translateY(12px);
+        animation: cardIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .card:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.25s;
+      }
+      @keyframes cardIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .card:hover {
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+      }
+      .card.selected {
+        box-shadow: var(--shadow-card-active);
+        background: var(--bg-card-hover);
+      }
+      .card.selected::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+      }
+
+      .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 18px 18px 14px;
+        gap: 12px;
+      }
+      .card-numbering {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--fg-subtle);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .card-numbering b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .card-tag {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 600;
+        padding: 3px 7px;
+        border-radius: 999px;
+        border: 1px solid var(--border-bright);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        background: oklch(1 0 0 / 0.02);
+      }
+      .card-tag.simple {
+        color: var(--accent-cool);
+        border-color: oklch(0.5 0.08 222);
+      }
+      .card-tag.daemon {
+        color: var(--accent);
+        border-color: var(--accent-dim);
+      }
+      .card-tag.hybrid {
+        color: var(--accent-violet);
+        border-color: oklch(0.5 0.1 290);
+      }
+      .card-rec {
+        margin-left: auto;
+        margin-top: 2px;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      /* === ARCH DIAGRAM === */
+      .arch-canvas {
+        margin: 0 18px;
+        aspect-ratio: 16 / 11;
+        background: var(--bg-mock);
+        background-image:
+          linear-gradient(to right, oklch(0.2 0.006 255 / 0.5) 1px, transparent 1px),
+          linear-gradient(to bottom, oklch(0.2 0.006 255 / 0.5) 1px, transparent 1px);
+        background-size: 14px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        position: relative;
+        font-family: var(--font-mono);
+      }
+
+      .arch-label {
+        position: absolute;
+        font-size: 7.5px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--fg-subtle);
+        background: var(--bg-mock);
+        padding: 1px 4px;
+        border-radius: 2px;
+        z-index: 5;
+      }
+
+      .proc {
+        position: absolute;
+        background: var(--bg-mock-elev);
+        border: 1px solid var(--border-bright);
+        border-radius: 4px;
+        padding: 9px 10px;
+        color: var(--fg);
+        font-size: 9.5px;
+        line-height: 1.4;
+      }
+      .proc-title {
+        font-weight: 600;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 6px;
+        font-size: 9.5px;
+        letter-spacing: -0.01em;
+      }
+      .proc-title .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 5px var(--accent-glow);
+        animation: blink 1.6s infinite;
+      }
+      .proc-title .dot.cool {
+        background: var(--accent-cool);
+        box-shadow: 0 0 5px oklch(0.78 0.11 222 / 0.5);
+      }
+      .proc-title .dot.warm {
+        background: var(--accent-warm);
+        box-shadow: 0 0 5px oklch(0.76 0.13 48 / 0.5);
+      }
+      .proc-meta {
+        font-size: 7.5px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-top: 1px;
+      }
+      .proc-subs {
+        margin-top: 5px;
+        border-top: 1px dashed var(--border);
+        padding-top: 5px;
+        font-size: 8px;
+        color: var(--fg-muted);
+      }
+      .proc-subs .sub-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        line-height: 1.6;
+      }
+      .proc-subs .sub-row .pdot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .proc-subs .sub-row .pdot.idle {
+        background: var(--fg-faint);
+      }
+      .proc-subs .sub-row .pdot.warm {
+        background: var(--accent-warm);
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.35;
+        }
+      }
+
+      .proc.electron {
+        border-color: var(--accent-cool);
+        background: oklch(0.21 0.012 222 / 0.5);
+      }
+      .proc.electron .proc-title {
+        color: var(--accent-cool);
+      }
+      .proc.daemon {
+        border-color: var(--accent);
+        background: oklch(0.21 0.05 112 / 0.18);
+      }
+      .proc.daemon .proc-title {
+        color: var(--accent);
+      }
+      .proc.cli {
+        background: var(--bg-mock-deep);
+        border-color: var(--border);
+        font-size: 8.5px;
+        padding: 5px 7px;
+      }
+
+      /* edges between processes */
+      .edge {
+        position: absolute;
+        z-index: 1;
+      }
+      .edge-line {
+        background: var(--border-bright);
+        height: 1px;
+      }
+      .edge-line.ws {
+        background: repeating-linear-gradient(to right, var(--accent) 0 4px, transparent 4px 8px);
+        height: 1.5px;
+      }
+      .edge-line.dashed {
+        background: repeating-linear-gradient(
+          to right,
+          var(--fg-subtle) 0 3px,
+          transparent 3px 6px
+        );
+      }
+      .edge-line.vertical {
+        width: 1px;
+        height: 100%;
+      }
+      .edge-label {
+        position: absolute;
+        font-size: 7px;
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        background: var(--bg-mock);
+        padding: 1px 4px;
+        border-radius: 2px;
+      }
+      .edge-label.muted {
+        color: var(--fg-subtle);
+      }
+
+      /* status badges in corner */
+      .resilience {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        z-index: 6;
+        text-align: right;
+      }
+      .resilience .pill {
+        font-family: var(--font-mono);
+        font-size: 7px;
+        padding: 2px 6px;
+        border-radius: 2px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .resilience .pill.good {
+        background: oklch(0.86 0.19 112 / 0.1);
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
+      }
+      .resilience .pill.bad {
+        background: oklch(0.7 0.18 25 / 0.08);
+        border: 1px solid oklch(0.45 0.14 25);
+        color: oklch(0.78 0.16 25);
+      }
+      .resilience .pill.mid {
+        background: oklch(0.76 0.13 48 / 0.08);
+        border: 1px solid oklch(0.5 0.1 48);
+        color: var(--accent-warm);
+      }
+
+      /* === CARD BODY === */
+      .card-body {
+        padding: 16px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+        margin-top: 14px;
+      }
+      .card-title {
+        font-family: var(--font-mono);
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--fg);
+      }
+      .card-desc {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--fg-muted);
+      }
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .meta-chip {
+        font-family: var(--font-mono);
+        font-size: 9.5px;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: oklch(0.22 0.006 255 / 0.7);
+        border: 1px solid var(--border);
+        color: var(--fg-muted);
+        letter-spacing: 0.02em;
+      }
+      .card-bestfor {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        letter-spacing: 0.05em;
+        border-top: 1px solid var(--border);
+        padding-top: 12px;
+        margin-top: 4px;
+      }
+      .card-bestfor .label {
+        color: var(--accent);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 9px;
+        margin-right: 6px;
+      }
+
+      /* tradeoff inline */
+      .tradeoff-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--fg-muted);
+        padding: 4px 0;
+        border-bottom: 1px dashed var(--border);
+        font-family: var(--font-sans);
+      }
+      .tradeoff-row:last-child {
+        border-bottom: none;
+      }
+      .tradeoff-row .ico {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--accent);
+        width: 14px;
+      }
+      .tradeoff-row .ico.no {
+        color: oklch(0.7 0.16 25);
+      }
+      .tradeoff-row .ico.maybe {
+        color: var(--accent-warm);
+      }
+      .tradeoffs {
+        margin-top: 6px;
+      }
+
+      /* === FOOTER === */
+      .footer {
+        padding: 24px 28px 36px;
+        border-top: 1px solid var(--border);
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .footer-kbd {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--fg-subtle);
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .footer-kbd .key {
+        border: 1px solid var(--border-bright);
+        padding: 2px 6px;
+        border-radius: 3px;
+        background: var(--bg-card);
+        color: var(--fg);
+      }
+      #indicator-text {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--fg-muted);
+        letter-spacing: 0.04em;
+      }
+      #indicator-text .selected-text {
+        color: var(--accent);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <!-- SYSTEM STRIP -->
+      <div class="system-strip">
+        <div class="wordmark">
+          <span class="wordmark-glyph"></span>
+          <span>DYCODE</span>
+        </div>
+        <span class="system-sep"></span>
+        <div class="crumbs">
+          <span class="past">Control Room ✓</span>
+          <span class="arrow">→</span>
+          <span class="past">Squads + Pool ✓</span>
+          <span class="arrow">→</span>
+          <span class="current">Runtime architecture</span>
+          <span class="tag">03 / 06</span>
+        </div>
+        <span class="system-meta">DESIGN MODE</span>
+      </div>
+
+      <!-- HEADER -->
+      <header class="header">
+        <div class="eyebrow">03 / 06 · Process Topology &amp; Persistence</div>
+        <h1 class="title">
+          Where does the agent <span class="em">runtime live</span>? <span class="slash">/</span>
+          Inside Electron or its own process.
+        </h1>
+        <p class="subtitle">
+          With persistent squads, fleet state has to survive an IDE crash, a laptop sleep, or
+          running the IDE on a workstation while watching from your phone. This decision shapes how
+          agents are launched, where their stdio is piped, and whether dycode can ever go
+          "headless". Edges show inter-process communication:
+          <code style="color: var(--accent)">━ ━ ━</code> = WebSocket, <code>──</code> = pipe.
+        </p>
+      </header>
+
+      <!-- CARDS -->
+      <div class="cards-grid">
+        <!-- ========== A: IN-PROCESS ========== -->
+        <div class="card" data-choice="in-process" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION A</b> · 01</div>
+            <div class="card-tag simple">Single process</div>
+          </div>
+
+          <div class="arch-canvas">
+            <span class="arch-label" style="top: 6px; left: 8px">PROCESS GRAPH · A</span>
+
+            <!-- Electron container -->
+            <div class="proc electron" style="top: 30px; left: 16px; right: 16px">
+              <div class="proc-title"><span class="dot cool"></span>Electron · dycode.app</div>
+              <div class="proc-meta">renderer + main (one process tree)</div>
+              <div class="proc-subs">
+                <div class="sub-row">
+                  <span class="pdot"></span>main.ts · spawns &amp; manages CLIs
+                </div>
+                <div class="sub-row">
+                  <span class="pdot"></span>orchestrator.ts · squads + routing
+                </div>
+                <div class="sub-row"><span class="pdot"></span>sqlite (renderer-owned)</div>
+              </div>
+            </div>
+
+            <!-- Edge to CLIs -->
+            <div class="edge" style="top: 154px; left: 84px; width: 1px; height: 18px">
+              <div class="edge-line vertical"></div>
+            </div>
+            <div class="edge" style="top: 170px; left: 28px; width: 200px; height: 1px">
+              <div class="edge-line"></div>
+            </div>
+
+            <!-- CLI nodes -->
+            <div class="proc cli" style="top: 174px; left: 20px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent)"
+                ></span>
+                claude-code
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">pty · stdio</div>
+            </div>
+            <div class="proc cli" style="top: 174px; left: 110px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent)"
+                ></span>
+                codex
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">pty · stdio</div>
+            </div>
+            <div class="proc cli" style="top: 174px; left: 185px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    background: var(--accent-warm);
+                  "
+                ></span>
+                hermes
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">queued</div>
+            </div>
+
+            <div class="resilience">
+              <div class="pill good">+ simple install</div>
+              <div class="pill bad">− crash = fleet gone</div>
+              <div class="pill bad">− no headless</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Single Process</h3>
+            <p class="card-desc">
+              Electron does everything: spawns CLIs as child processes, runs the orchestrator, owns
+              the SQLite. One binary, one install, zero ceremony.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">1 process</span>
+              <span class="meta-chip">SQLite</span>
+              <span class="meta-chip">No daemon</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Shipping fast and hobbyist use — kill IDE = kill
+              everything
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== B: SIDECAR DAEMON ========== -->
+        <div class="card" data-choice="sidecar-daemon" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION B</b> · 02</div>
+            <div class="card-tag daemon">Sidecar daemon</div>
+            <div class="card-rec">★ Recommended</div>
+          </div>
+
+          <div class="arch-canvas">
+            <span class="arch-label" style="top: 6px; left: 8px">PROCESS GRAPH · B</span>
+
+            <!-- Electron (thin) -->
+            <div class="proc electron" style="top: 30px; left: 16px; width: 140px">
+              <div class="proc-title"><span class="dot cool"></span>Electron</div>
+              <div class="proc-meta">UI only · thin client</div>
+              <div class="proc-subs">
+                <div class="sub-row"><span class="pdot"></span>React + shadcn</div>
+                <div class="sub-row"><span class="pdot"></span>fleet view</div>
+              </div>
+            </div>
+
+            <!-- WS edge between electron and daemon -->
+            <div class="edge" style="top: 70px; left: 158px; width: 30px; height: 2px">
+              <div class="edge-line ws"></div>
+            </div>
+            <div class="edge-label" style="top: 56px; left: 158px">WS / IPC</div>
+
+            <!-- Daemon -->
+            <div class="proc daemon" style="top: 30px; right: 16px; width: 178px">
+              <div class="proc-title"><span class="dot"></span>dycoded · Node daemon</div>
+              <div class="proc-meta">orchestrator + agent host</div>
+              <div class="proc-subs">
+                <div class="sub-row"><span class="pdot"></span>squads + pool + routing</div>
+                <div class="sub-row"><span class="pdot"></span>SQLite (durable state)</div>
+                <div class="sub-row"><span class="pdot"></span>handoff log + replay</div>
+              </div>
+            </div>
+
+            <!-- Vertical edge from daemon down -->
+            <div class="edge" style="top: 154px; left: 282px; width: 1px; height: 18px">
+              <div class="edge-line vertical"></div>
+            </div>
+            <div class="edge" style="top: 170px; left: 184px; right: 16px; height: 1px">
+              <div class="edge-line"></div>
+            </div>
+
+            <!-- CLI children of daemon -->
+            <div class="proc cli" style="top: 174px; left: 186px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent)"
+                ></span>
+                claude-code
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">pty</div>
+            </div>
+            <div class="proc cli" style="top: 174px; left: 256px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent)"
+                ></span>
+                codex
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">pty</div>
+            </div>
+            <div class="proc cli" style="top: 174px; left: 320px">
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span
+                  style="
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    background: var(--accent-warm);
+                  "
+                ></span>
+                hermes
+              </div>
+              <div class="proc-meta" style="font-size: 6.5px; margin-top: 2px">queue</div>
+            </div>
+
+            <div class="resilience">
+              <div class="pill good">+ survives crash</div>
+              <div class="pill good">+ headless mode</div>
+              <div class="pill mid">− 2 processes</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Sidecar Daemon</h3>
+            <p class="card-desc">
+              A separate
+              <code
+                style="
+                  font-family: var(--font-mono);
+                  background: var(--bg-mock);
+                  padding: 0 4px;
+                  border-radius: 2px;
+                  border: 1px solid var(--border);
+                "
+                >dycoded</code
+              >
+              Node process owns the agents, SQLite, and orchestration. Electron is a thin client
+              over WebSocket. Close the IDE, agents keep working. Headless mode is a free
+              side-effect — connect from another machine, or no UI at all.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">Crash-resilient</span>
+              <span class="meta-chip">Headless capable</span>
+              <span class="meta-chip">Multi-client</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Long-running squads, overnight runs, server
+              deployment (multica-style)
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== C: EMBEDDED-OPTIONAL-DAEMON ========== -->
+        <div class="card" data-choice="embedded-then-daemon" onclick="toggleSelect(this)">
+          <div class="card-head">
+            <div class="card-numbering"><b>OPTION C</b> · 03</div>
+            <div class="card-tag hybrid">Default / Pro</div>
+          </div>
+
+          <div class="arch-canvas">
+            <span class="arch-label" style="top: 6px; left: 8px">PROCESS GRAPH · C</span>
+
+            <!-- Mode A label -->
+            <div class="arch-label" style="top: 28px; left: 8px; color: var(--accent-cool)">
+              DEFAULT MODE
+            </div>
+            <!-- Mode B label -->
+            <div class="arch-label" style="top: 28px; right: 8px; color: var(--accent)">
+              PRO MODE
+            </div>
+
+            <!-- Vertical divider -->
+            <div
+              style="
+                position: absolute;
+                top: 46px;
+                bottom: 24px;
+                left: 50%;
+                width: 1px;
+                background: var(--border);
+                z-index: 0;
+              "
+            ></div>
+
+            <!-- LEFT: Embedded mode -->
+            <div class="proc electron" style="top: 50px; left: 12px; width: 165px">
+              <div class="proc-title"><span class="dot cool"></span>Electron · single</div>
+              <div class="proc-meta">spawns CLIs in-process</div>
+            </div>
+            <div class="edge" style="top: 110px; left: 92px; width: 1px; height: 18px">
+              <div class="edge-line vertical"></div>
+            </div>
+            <div class="proc cli" style="top: 130px; left: 30px; width: 60px">
+              <div style="font-size: 8.5px">claude</div>
+              <div class="proc-meta" style="font-size: 6.5px">pty</div>
+            </div>
+            <div class="proc cli" style="top: 130px; left: 110px; width: 50px">
+              <div style="font-size: 8.5px">codex</div>
+              <div class="proc-meta" style="font-size: 6.5px">pty</div>
+            </div>
+            <div class="arch-label" style="bottom: 8px; left: 12px; font-size: 6.5px">
+              ZERO-CONFIG
+            </div>
+
+            <!-- RIGHT: Daemon mode -->
+            <div class="proc electron" style="top: 50px; left: 50%; margin-left: 12px; width: 80px">
+              <div class="proc-title"><span class="dot cool"></span>Electron</div>
+              <div class="proc-meta">UI thin</div>
+            </div>
+            <div class="edge" style="top: 70px; left: calc(50% + 92px); width: 30px; height: 2px">
+              <div class="edge-line ws"></div>
+            </div>
+            <div class="proc daemon" style="top: 50px; right: 12px; width: 80px">
+              <div class="proc-title"><span class="dot"></span>dycoded</div>
+              <div class="proc-meta">opt-in</div>
+            </div>
+            <div class="edge" style="top: 110px; right: 50px; width: 1px; height: 18px">
+              <div class="edge-line vertical"></div>
+            </div>
+            <div class="proc cli" style="top: 130px; right: 80px; width: 50px">
+              <div style="font-size: 8.5px">claude</div>
+              <div class="proc-meta" style="font-size: 6.5px">pty</div>
+            </div>
+            <div class="proc cli" style="top: 130px; right: 20px; width: 50px">
+              <div style="font-size: 8.5px">codex</div>
+              <div class="proc-meta" style="font-size: 6.5px">pty</div>
+            </div>
+            <div
+              class="arch-label"
+              style="bottom: 8px; right: 12px; font-size: 6.5px; color: var(--accent)"
+            >
+              SURVIVES CRASH
+            </div>
+
+            <div class="resilience" style="bottom: 8px; right: 50%; transform: translateX(50%)">
+              <div class="pill mid">2× code paths</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">Default / Pro Modes</h3>
+            <p class="card-desc">
+              Ship the single-process mode for first-time users (zero install ceremony, fastest
+              happy path). Power users flip a setting to enable <em>pro mode</em> with the sidecar
+              daemon for durability and headless ops. Same UI code, two backends.
+            </p>
+            <div class="card-meta">
+              <span class="meta-chip">Beginner-friendly</span>
+              <span class="meta-chip">Pro-extensible</span>
+              <span class="meta-chip">Two code paths</span>
+            </div>
+            <div class="card-bestfor">
+              <span class="label">BEST FOR</span>Maximum reach — but doubles surface area to
+              maintain
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div id="indicator-text">Click an option above, then return to the terminal</div>
+        <div class="footer-kbd">
+          <span class="key">A</span><span class="key">B</span><span class="key">C</span>
+          <span>to select</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('keydown', (e) => {
+        const map = { a: 0, b: 1, c: 2, A: 0, B: 1, C: 2 }
+        if (map[e.key] !== undefined) {
+          const cards = document.querySelectorAll('.card')
+          const card = cards[map[e.key]]
+          if (card) {
+            card.click()
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
