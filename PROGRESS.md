@@ -82,3 +82,37 @@ Blockers:
 - None.
 
 Tagged: `v0.0.2-plan-02`.
+
+---
+
+## 2026-05-24 · Plan 04 · Plan file expanded (pre-execution)
+
+Done:
+
+- Expanded `docs/superpowers/plans/2026-05-23-plan-04-adapter-host.md` from a 66-line
+  stub to a 4,200-line bite-sized executable plan via `superpowers:writing-plans`.
+- 26 TDD-style tasks cover the full adapter-host vertical slice: additive bump of
+  `@dycode/adapter-sdk` to 0.2.0 (`AdapterFlavor` literal, `manifest.flavor` +
+  `concurrencyCap`, optional `AdapterPlugin.configSchema`), migration `003-adapters`
+  - `AdapterRepository`, loader/discovery/registry/host quartet, capability gate,
+    `InstanceController` lifecycle, `node-pty` channel for `flavor: 'pty'`,
+    health-probe scheduler, `AdapterEvent → EventLogEntry` IPC bridge, the five
+    `adapter.*` + `runtime.scan` handlers, canonical fixture adapter, end-to-end
+    Vitest spec, `dycoded adapter list` CLI subcommand, `docs/architecture/adapter-host.md`
+    deep doc, and F15-F20 close-out.
+- Every task has complete code blocks and exact commands (no placeholders).
+- Self-review checklist included in the plan: spec §5 coverage map, placeholder scan,
+  type-consistency scan.
+- `./scripts/verify.sh` exits 0 on the docs-only change (gates 1-4 green; 135 tests).
+
+Remaining (Plan 04 execution itself):
+
+- Pick up the plan via `superpowers:subagent-driven-development`, execute task-by-task,
+  then close out with `v0.0.4-plan-04` tag.
+- Plan 04 row in `docs/superpowers/plans/README.md` stays `not started` until execution
+  lands.
+
+Blockers:
+
+- Plan 03 (`dycoded` daemon skeleton) must ship first — Plan 04's starting state assumes
+  the daemon, dispatcher, event bus, event-log repo, and `DycodeClient` from Plan 03.
