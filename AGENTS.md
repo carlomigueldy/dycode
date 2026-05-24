@@ -29,6 +29,7 @@ pnpm test:watch
 - Active plan → `docs/superpowers/plans/`
 - Architecture → `docs/architecture/` (later plans)
 - Per-package map → `packages/<name>/AGENTS.md`
+- Project skills → `.claude/settings.json` (`superpowers`, `frontend-design`)
 
 ## Rules of engagement
 
@@ -42,6 +43,12 @@ pnpm test:watch
 8. No half-broken features. Verification command required per feature.
 9. No LLM attribution in commits, PRs, or tags. Author is the human; no
    `Co-Authored-By: <LLM>` lines.
+10. Superpowers-first. Reach for `superpowers:<skill>` (TDD, debugging,
+    brainstorming, dispatching parallel agents, requesting/receiving code
+    review, plan writing, git worktrees) before improvising a workflow.
+11. UI work pre-loads `/frontend-design:frontend-design`. Any agent on React,
+    shadcn, Tailwind, or the Electron renderer loads it on session start and
+    follows the design system it encodes. No bespoke styling that diverges.
 
 ## Progressive disclosure
 

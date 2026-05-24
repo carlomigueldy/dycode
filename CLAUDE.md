@@ -27,6 +27,7 @@ pnpm test:watch       # iterative dev loop
 - **Adapter SDK** → `docs/adapters/sdk.md` · package: `packages/adapter-sdk/CLAUDE.md`
 - **IPC protocol** → `docs/ipc-protocol/spec.md` · package: `packages/contracts/CLAUDE.md`
 - **Contracts package** → `packages/contracts/CLAUDE.md`
+- **Project skills** → `.claude/settings.json` (`superpowers`, `frontend-design`)
 
 ## Hard constraints
 
@@ -45,6 +46,13 @@ pnpm test:watch       # iterative dev loop
 9. **No LLM attribution in commits.** Commits must list a human as author and
    contain no `Co-Authored-By:` lines naming an LLM (Claude, GPT, Codex, etc.).
    The work is yours; tools assist. Same rule for PR descriptions and tags.
+10. **Superpowers-first.** Reach for `superpowers:<skill>` (TDD, debugging,
+    brainstorming, dispatching parallel agents, requesting/receiving code
+    review, plan writing, git worktrees) before improvising a workflow.
+11. **UI work pre-loads `/frontend-design:frontend-design`.** Any agent touching
+    React, shadcn, Tailwind, or the Electron renderer loads the skill on
+    session start and stays consistent with the design system it encodes. No
+    bespoke styling that diverges from it.
 
 ## Layout (current)
 
