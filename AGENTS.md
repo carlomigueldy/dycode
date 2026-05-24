@@ -41,8 +41,9 @@ pnpm test:watch
 6. Conventional commits.
 7. No emojis in source / docs unless requested for UI.
 8. No half-broken features. Verification command required per feature.
-9. No LLM attribution in commits, PRs, or tags. Author is the human; no
-   `Co-Authored-By: <LLM>` lines.
+9. Never attribute work to an LLM. Commits, PRs, tags, and code comments list
+   humans only — never an LLM (Claude, GPT, Codex, Copilot, etc.) as author,
+   committer, `Co-Authored-By`, or in-code attribution. The work is yours.
 10. Superpowers-first. Reach for `superpowers:<skill>` (TDD, debugging,
     brainstorming, dispatching parallel agents, requesting/receiving code
     review, plan writing, git worktrees) before improvising a workflow.
