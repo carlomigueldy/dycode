@@ -1,0 +1,14 @@
+{
+  "extraKnownMarketplaces": {
+    "superpowers-dev": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers",
+        "ref": "v5.1.0"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-dev": true
+  }
+}
